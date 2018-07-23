@@ -1,0 +1,227 @@
+{
+    "HOL-1902-T1" : {
+      "token" : "abcdefgh-ijkl-mnop-qrst-uvwxyzabcdef",
+      "aws_access_id" : "",
+      "aws_access_key" : "",
+      "azure_subscription_id" : "",
+      "azure_tenant_id" : "",
+      "azure_client_application_id" : "",
+      "azure_client_application_secret_key" : ""
+    },
+    "HOL-1902-T2" : {
+      "token" : "12345678-9123-4567-8912-345678912345",
+      "aws_access_id" : "",
+      "aws_access_key" : "",
+      "azure_subscription_id" : "",
+      "azure_tenant_id" : "",
+      "azure_client_application_id" : "",
+      "azure_client_application_secret_key" : ""
+    },
+    "HOL-1902-T3" : {
+      "token" : "",
+      "aws_access_id" : "",
+      "aws_access_key" : "",
+      "azure_subscription_id" : "",
+      "azure_tenant_id" : "",
+      "azure_client_application_id" : "",
+      "azure_client_application_secret_key" : ""
+    },
+    "HOL-1902-T4" : {
+      "token" : "",
+      "aws_access_id" : "",
+      "aws_access_key" : "",
+      "azure_subscription_id" : "",
+      "azure_tenant_id" : "",
+      "azure_client_application_id" : "",
+      "azure_client_application_secret_key" : ""
+    },
+    "HOL-1902-T5" : {
+      "token" : "",
+      "aws_access_id" : "",
+      "aws_access_key" : "",
+      "azure_subscription_id" : "",
+      "azure_tenant_id" : "",
+      "azure_client_application_id" : "",
+      "azure_client_application_secret_key" : ""
+    },
+    "HOL-1902-T6" : {
+      "token" : "",
+      "aws_access_id" : "",
+      "aws_access_key" : "",
+      "azure_subscription_id" : "",
+      "azure_tenant_id" : "",
+      "azure_client_application_id" : "",
+      "azure_client_application_secret_key" : ""
+    },
+    "HOL-1902-T7" : {
+      "token" : "",
+      "aws_access_id" : "",
+      "aws_access_key" : "",
+      "azure_subscription_id" : "",
+      "azure_tenant_id" : "",
+      "azure_client_application_id" : "",
+      "azure_client_application_secret_key" : ""
+    },
+    "HOL-1902-T8" : {
+      "token" : "",
+      "aws_access_id" : "",
+      "aws_access_key" : "",
+      "azure_subscription_id" : "",
+      "azure_tenant_id" : "",
+      "azure_client_application_id" : "",
+      "azure_client_application_secret_key" : ""
+    },
+    "HOL-1902-T9" : {
+      "token" : "",
+      "aws_access_id" : "",
+      "aws_access_key" : "",
+      "azure_subscription_id" : "",
+      "azure_tenant_id" : "",
+      "azure_client_application_id" : "",
+      "azure_client_application_secret_key" : ""
+    },
+    "HOL-1902-T10" : {
+      "token" : "",
+      "aws_access_id" : "",
+      "aws_access_key" : "",
+      "azure_subscription_id" : "",
+      "azure_tenant_id" : "",
+      "azure_client_application_id" : "",
+      "azure_client_application_secret_key" : ""
+    },
+    "HOL-1902-T11" : {
+      "token" : "",
+      "aws_access_id" : "",
+      "aws_access_key" : "",
+      "azure_subscription_id" : "",
+      "azure_tenant_id" : "",
+      "azure_client_application_id" : "",
+      "azure_client_application_secret_key" : ""
+    },
+    "HOL-1902-T12" : {
+      "token" : "",
+      "aws_access_id" : "",
+      "aws_access_key" : "",
+      "azure_subscription_id" : "",
+      "azure_tenant_id" : "",
+      "azure_client_application_id" : "",
+      "azure_client_application_secret_key" : ""
+    },
+    "HOL-1902-T13" : {
+      "token" : "",
+      "aws_access_id" : "",
+      "aws_access_key" : "",
+      "azure_subscription_id" : "",
+      "azure_tenant_id" : "",
+      "azure_client_application_id" : "",
+      "azure_client_application_secret_key" : ""
+    },
+    "HOL-1902-T14" : {
+      "token" : "",
+      "aws_access_id" : "",
+      "aws_access_key" : "",
+      "azure_subscription_id" : "",
+      "azure_tenant_id" : "",
+      "azure_client_application_id" : "",
+      "azure_client_application_secret_key" : ""
+    },
+    "HOL-1902-T15" : {
+      "token" : "",
+      "aws_access_id" : "",
+      "aws_access_key" : "",
+      "azure_subscription_id" : "",
+      "azure_tenant_id" : "",
+      "azure_client_application_id" : "",
+      "azure_client_application_secret_key" : ""
+    },
+    "HOL-1902-T16" : {
+      "token" : "",
+      "aws_access_id" : "",
+      "aws_access_key" : "",
+      "azure_subscription_id" : "",
+      "azure_tenant_id" : "",
+      "azure_client_application_id" : "",
+      "azure_client_application_secret_key" : ""
+    },
+    "HOL-1902-T17" : {
+      "token" : "",
+      "aws_access_id" : "",
+      "aws_access_key" : "",
+      "azure_subscription_id" : "",
+      "azure_tenant_id" : "",
+      "azure_client_application_id" : "",
+      "azure_client_application_secret_key" : ""
+    },
+    "HOL-1902-T18" : {
+      "token" : "",
+      "aws_access_id" : "",
+      "aws_access_key" : "",
+      "azure_subscription_id" : "",
+      "azure_tenant_id" : "",
+      "azure_client_application_id" : "",
+      "azure_client_application_secret_key" : ""
+    },
+    "HOL-1902-T19" : {
+      "token" : "",
+      "aws_access_id" : "",
+      "aws_access_key" : "",
+      "azure_subscription_id" : "",
+      "azure_tenant_id" : "",
+      "azure_client_application_id" : "",
+      "azure_client_application_secret_key" : ""
+    },
+    "HOL-1902-T20" : {
+      "token" : "",
+      "aws_access_id" : "",
+      "aws_access_key" : "",
+      "azure_subscription_id" : "",
+      "azure_tenant_id" : "",
+      "azure_client_application_id" : "",
+      "azure_client_application_secret_key" : ""
+    },
+    "HOL-1902-T21" : {
+      "token" : "",
+      "aws_access_id" : "",
+      "aws_access_key" : "",
+      "azure_subscription_id" : "",
+      "azure_tenant_id" : "",
+      "azure_client_application_id" : "",
+      "azure_client_application_secret_key" : ""
+    },
+    "HOL-1902-T22" : {
+      "token" : "",
+      "aws_access_id" : "",
+      "aws_access_key" : "",
+      "azure_subscription_id" : "",
+      "azure_tenant_id" : "",
+      "azure_client_application_id" : "",
+      "azure_client_application_secret_key" : ""
+    },
+    "HOL-1902-T23" : {
+      "token" : "",
+      "aws_access_id" : "",
+      "aws_access_key" : "",
+      "azure_subscription_id" : "",
+      "azure_tenant_id" : "",
+      "azure_client_application_id" : "",
+      "azure_client_application_secret_key" : ""
+    },
+    "HOL-1902-T24" : {
+      "token" : "",
+      "aws_access_id" : "",
+      "aws_access_key" : "",
+      "azure_subscription_id" : "",
+      "azure_tenant_id" : "",
+      "azure_client_application_id" : "",
+      "azure_client_application_secret_key" : ""
+    },
+    "HOL-1902-T25" : {
+      "token" : "",
+      "aws_access_id" : "",
+      "aws_access_key" : "",
+      "azure_subscription_id" : "",
+      "azure_tenant_id" : "",
+      "azure_client_application_id" : "",
+      "azure_client_application_secret_key" : ""
+    }
+  }
