@@ -217,18 +217,18 @@ class CloudZone(object):
     Classes for Cloud Zone methods.  
     """
     @staticmethod
-    def list(session):
-        uri = '/blueprint/api/blueprints/'
+    def list(session, pt=False):
+        uri = '/iaas/zones/'
         r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
         p = r.json()
-        bps = list()
-        table = PrettyTable(['BlueprintID'])
-        for i in p['links']:
-            i =i.lstrip('/blueprint/api/blueprints/')
-            bps.append(i)
-            table.add_row([i])
-        print(table)
-        return bps
+        data = list()
+        table = PrettyTable(['ID','Name'])
+        for i in p:
+            data.append(i)
+            table.add_row([i['id'],i['name']])
+        if pt == 'pt':
+            print(table)
+        return data
 
 class Deployment(object):
     """
@@ -240,15 +240,18 @@ class Deployment(object):
         uri = '/deployment/api/deployments'
         r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
         p = r.json()
-        deployments = list()
+        print(p)
+        data = list()
         table = PrettyTable(['DeploymentName', 'DeploymentID', 'LastUpdatedBy'])
+        """
         for i in p['results']:
             #i =i.lstrip('/deployment/api/deployments/')
             print(i)
-            deployments.append(i)
+            data.append(i)
             table.add_row([i['name'], i['id'], i['updatedBy']])
+        """
         print(table)
-        return deployments
+        return data
 
     @staticmethod
     def delete(session, deployments):
