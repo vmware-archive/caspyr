@@ -4,7 +4,7 @@
     via REST API and Python
 
     See readme.md for details on utilization
-    
+
 """
 
-from .vmcs import Session, Blueprint, CloudAccount, Deployment, Project, CloudZone
+from .vmcs import Session, Blueprint, CloudAccount, Deployment, Project, CloudZone, NetworkProfile
