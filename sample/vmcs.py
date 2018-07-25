@@ -44,10 +44,10 @@ class Blueprint(object):
     def list(session, pt=False):
         uri = '/blueprint/api/blueprints/'
         r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
-        p = r.json()
+        j = r.json()
         bps = list()
         table = PrettyTable(['BlueprintID'])
-        for i in p['links']:
+        for i in j['links']:
             i = os.path.split(i)[1]
             bps.append(i)
             table.add_row([i])
@@ -60,11 +60,11 @@ class Blueprint(object):
         table = PrettyTable(['Name', 'CreatedBy', 'LastUpdated'])
         uri= f'/blueprint/api/blueprints/{bp}'
         r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
-        p = r.json()
+        j = r.json()
         if r.status_code == 403:
             print(f'You do not have sufficient access to org {org} to list its details.')
         else:
-            table.add_row([p['name'], p['createdBy'], p['updatedAt']])
+            table.add_row([j['name'], j['createdBy'], j['updatedAt']])
         print(table)
         return
 
@@ -74,13 +74,13 @@ class Blueprint(object):
         for bp in bps:
             uri= f'/blueprint/api/blueprints/{bp}'
             r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
-            p = r.json()
-            print(p['id'])
+            j = r.json()
+            print(j['id'])
             """
             if r.status_code == 403:
                 print(f'You do not have sufficient access to org {org} to list its details.')
             else:
-                table.add_row([p['name']])
+                table.add_row([j['name']])
         print(table)
         return
         """
@@ -98,10 +98,10 @@ class Blueprint(object):
     def request(session):
         uri = '/blueprint/api/blueprint-requests/'
         r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
-        p = r.json()
+        j = r.json()
         data = list()
         table = PrettyTable(['RequestID'])
-        for i in p['links']:
+        for i in j['links']:
             i = os.path.split(i)[1]
             #n = n.lstrip('/blueprint/api/blueprint-request')
             data.append(i)
@@ -116,9 +116,9 @@ class Blueprint(object):
         for i in bp_requests:
             uri = f'/blueprint/api/blueprint-requests/{i}'
             r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
-            p = r.json()
-            data.append(p)
-            table.add_row([p['deploymentId'],p['deploymentName'],p['status']])
+            j = r.json()
+            data.append(j)
+            table.add_row([j['deploymentId'],j['deploymentName'],j['status']])
         print(table)
         return data
 
@@ -144,12 +144,12 @@ class CloudAccount(object):
     def list(session):
         uri = '/iaas/cloud-accounts'
         r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
-        p = r.json()
+        j = r.json()
         data = list()
         table = PrettyTable(['CloudAccountID'])
-        for i in p['links']:
+        for i in j['links']:
             i =i.lstrip('/iaas/cloud-accounts')
-            accounts.append(i)
+            data.append(i)
             table.add_row([i])
         print(table)
         return data
@@ -174,16 +174,16 @@ class Project(object):
     def list(session):
         uri = '/iaas/projects'
         r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
-        p = r.json()
+        j = r.json()
         data = list()
-        for i in p:
+        for i in j:
             data.append(i)
         return data
 
     @staticmethod
     def delete(session, projects):
         data = list()
-        for i in projects:
+        for i in jrojects:
             id = i['id']
             uri = f'/iaas/projects/{id}'
             r = requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
@@ -200,17 +200,25 @@ class DataCollector(object):
 
     @staticmethod
     def list(session):
-        uri = '/iaas/zones/'
+        uri = '/api/data-collector/'
         r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
-        p = r.json()
-        czs = list()
-        table = PrettyTable(['BlueprintID'])
-        for i in p['links']:
-            i =i.lstrip('/blueprint/api/blueprints/')
-            bps.append(i)
-            table.add_row([i])
-        print(table)
-        return bps
+        j = r.json()
+        print(len(j),'Data Collectors found')
+        return j
+
+    @staticmethod
+    def delete(session, collectors):
+        data = list()
+        for i in collectors:
+            id = i['dcId']
+            uri = f'/api/data-collector/{id}'
+            r = requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
+            if r.status_code != 200:
+                print("Unable to delete data collector",i['name'],"status code",r.status_code)
+            else:
+                print("Deleted data collector",i['name'])
+                data.append(i)
+            return data
 
 class CloudZone(object):
     """
@@ -220,10 +228,10 @@ class CloudZone(object):
     def list(session, pt=False):
         uri = '/iaas/zones/'
         r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
-        p = r.json()
+        j = r.json()
         data = list()
         table = PrettyTable(['ID','Name'])
-        for i in p:
+        for i in j:
             data.append(i)
             table.add_row([i['id'],i['name']])
         if pt == 'pt':
@@ -239,14 +247,15 @@ class Deployment(object):
     def list(session):
         uri = '/deployment/api/deployments'
         r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
-        p = r.json()
+        j = r.json()
         data = list()
-        for i in p:
+        for i in j:
             data.append(i)
         return data
 
     @staticmethod
     def delete(session, deployments):
+        data = list()
         for i in deployments:
             id = i['id']
             uri = f'/deployment/api/deployments/{id}'
@@ -265,13 +274,13 @@ class NetworkProfile(object):
     def list(session):
         uri = '/iaas/network-profiles'
         r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
-        p = r.json()
+        j = r.json()
         data = list()
         if r.status_code != 200:
             print('Unable to list network profiles, status code',r.status_code)
         else:
-            print(len(p),'network profiles found')
-            for i in p:
+            print(len(j),'network profiles found')
+            for i in j:
                 data.append(i)
         return data
 
