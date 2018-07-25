@@ -7,4 +7,4 @@
 
 """
 
-from .vmcs import Session, Blueprint, CloudAccount, Deployment, Project, CloudZone, NetworkProfile
+from .vmcs import Session, Blueprint, CloudAccount, Deployment, Project, CloudZone, NetworkProfile, DataCollector, StorageProfile
