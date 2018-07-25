@@ -12,7 +12,7 @@ class Session(object):
     Session class for instantiating a logged in session
     for VMCS.
 
-    Requires refresh token from VMCS portal to instantiate 
+    Requires refresh token from VMCS portal to instantiate
     """
     def __init__(self, auth_token):
         self.token = 'Bearer '+auth_token
@@ -29,17 +29,17 @@ class Session(object):
             if r.status_code != 200:
                 print(f'Unsuccessful Login Attempt. Error code {r.status_code}')
             else:
-                print('Login successful. ') 
+                print('Login successful. ')
                 auth_token = r.json()['token']
                 return self(auth_token)
 
 class Blueprint(object):
     """
-    Classes for Blueprint methods.  
+    Classes for Blueprint methods.
     """
     def __init__(self):
         pass
-        
+
     @staticmethod
     def list(session, pt=False):
         uri = '/blueprint/api/blueprints/'
@@ -67,7 +67,7 @@ class Blueprint(object):
             table.add_row([p['name'], p['createdBy'], p['updatedAt']])
         print(table)
         return
-    
+
     @staticmethod
     def list_detail(session, bps):
         table = PrettyTable(['Name'])
@@ -101,7 +101,7 @@ class Blueprint(object):
         p = r.json()
         data = list()
         table = PrettyTable(['RequestID'])
-        for i in p['links']:   
+        for i in p['links']:
             i = os.path.split(i)[1]
             #n = n.lstrip('/blueprint/api/blueprint-request')
             data.append(i)
@@ -114,7 +114,7 @@ class Blueprint(object):
         data = list()
         table = PrettyTable(['DeploymentId', 'DeploymentName', 'Status'])
         for i in bp_requests:
-            uri = f'/blueprint/api/blueprint-requests/{i}'            
+            uri = f'/blueprint/api/blueprint-requests/{i}'
             r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
             p = r.json()
             data.append(p)
@@ -132,14 +132,14 @@ class Blueprint(object):
                 print('Successfully cancelled request')
             else:
                 print('Cancellation failed with',r.status_code)
-    
+
 class CloudAccount(object):
     """
-    Classes for Cloud Account methods.  
+    Classes for Cloud Account methods.
     """
     def __init__(self):
         pass
-        
+
     @staticmethod
     def list(session):
         uri = '/iaas/cloud-accounts'
@@ -193,11 +193,11 @@ class Project(object):
 
 class DataCollector(object):
     """
-    Classes for Remote Data Collector methods.  
+    Classes for Remote Data Collector methods.
     """
     def __init__(self):
         pass
-        
+
     @staticmethod
     def list(session):
         uri = '/iaas/zones/'
@@ -214,7 +214,7 @@ class DataCollector(object):
 
 class CloudZone(object):
     """
-    Classes for Cloud Zone methods.  
+    Classes for Cloud Zone methods.
     """
     @staticmethod
     def list(session, pt=False):
@@ -232,7 +232,7 @@ class CloudZone(object):
 
 class Deployment(object):
     """
-    Classes for Cloud Zone methods.  
+    Classes for Cloud Zone methods.
     """
 
     @staticmethod
@@ -240,29 +240,52 @@ class Deployment(object):
         uri = '/deployment/api/deployments'
         r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
         p = r.json()
-        print(p)
         data = list()
-        table = PrettyTable(['DeploymentName', 'DeploymentID', 'LastUpdatedBy'])
-        """
-        for i in p['results']:
-            #i =i.lstrip('/deployment/api/deployments/')
-            print(i)
+        for i in p:
             data.append(i)
-            table.add_row([i['name'], i['id'], i['updatedBy']])
-        """
-        print(table)
         return data
 
     @staticmethod
     def delete(session, deployments):
         for i in deployments:
-            print(i)
             id = i['id']
             uri = f'/deployment/api/deployments/{id}'
-            print(uri)
             r = requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
-            print(r.status_code)
             if r.status_code != 200:
                 print("Unable to delete",i['name'],"status code",r.status_code)
             else:
                 print("Deleted deployment",i['name'])
+
+class NetworkProfile(object):
+    """
+    Class for Network Profile methods.
+    """
+
+    @staticmethod
+    def list(session):
+        uri = '/iaas/network-profiles'
+        r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
+        p = r.json()
+        data = list()
+        if r.status_code != 200:
+            print('Unable to list network profiles, status code',r.status_code)
+        else:
+            print(len(p),'network profiles found')
+            for i in p:
+                data.append(i)
+        return data
+
+    @staticmethod
+    def delete(session, network_profiles):
+        data = list()
+        for i in network_profiles:
+            id = i['id']
+            uri = f'/iaas/network-profiles/{id}'
+            print(uri)
+            r = requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
+            if r.status_code != 200:
+                print('Unable to delete network profile',i['name'],'status code',r.status_code)
+            else:
+                data.append(i['name'])
+        print(len(data),'networks deleted')
+        return data
