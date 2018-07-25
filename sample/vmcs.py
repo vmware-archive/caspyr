@@ -1,6 +1,4 @@
-"""
-Initial structure for classes and functions as they pertain to VMCS automation functions.
-"""
+"""Initial structure for classes and functions as they pertain to VMCS automation functions."""
 import requests
 import json
 import os
@@ -62,7 +60,7 @@ class Blueprint(object):
         r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
         j = r.json()
         if r.status_code == 403:
-            print(f'You do not have sufficient access to org {org} to list its details.')
+            print(f'You do not have sufficient access to org to list its details.')
         else:
             table.add_row([j['name'], j['createdBy'], j['updatedAt']])
         print(table)
@@ -70,20 +68,11 @@ class Blueprint(object):
 
     @staticmethod
     def list_detail(session, bps):
-        table = PrettyTable(['Name'])
-        for bp in bps:
-            uri= f'/blueprint/api/blueprints/{bp}'
+        for i in bps:
+            uri= f'/blueprint/api/blueprints/{i}'
             r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
             j = r.json()
             print(j['id'])
-            """
-            if r.status_code == 403:
-                print(f'You do not have sufficient access to org {org} to list its details.')
-            else:
-                table.add_row([j['name']])
-        print(table)
-        return
-        """
 
     @staticmethod
     def delete(session, bps):
@@ -183,7 +172,7 @@ class Project(object):
     @staticmethod
     def delete(session, projects):
         data = list()
-        for i in jrojects:
+        for i in projects:
             id = i['id']
             uri = f'/iaas/projects/{id}'
             r = requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
@@ -226,6 +215,7 @@ class CloudZone(object):
     """
     @staticmethod
     def list(session, pt=False):
+        """Takes a single input of your session bearer token"""
         uri = '/iaas/zones/'
         r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
         j = r.json()
@@ -255,7 +245,6 @@ class Deployment(object):
 
     @staticmethod
     def delete(session, deployments):
-        data = list()
         for i in deployments:
             id = i['id']
             uri = f'/deployment/api/deployments/{id}'
@@ -298,3 +287,30 @@ class NetworkProfile(object):
                 data.append(i['name'])
         print(len(data),'networks deleted')
         return data
+
+class StorageProfile(object):
+    @staticmethod
+    def list(session):
+        uri = '/provisioning/resources/storage-profiles'
+        r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
+        j = r.json()
+        data = list()
+        if r.status_code != 200:
+            print('Unable to list storage profiles, status code',r.status_code)
+        else:
+            print(len(j['documentLinks']),'storage profiles found')
+            for i in j['documentLinks']:
+                i = os.path.split(i)[1]
+                data.append(i)
+        return data
+
+    @staticmethod
+    def delete(session, profiles):
+        for i in profiles:
+            uri = f'/provisioning/resources/storage-profiles/{i}'
+            r = requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
+            j = r.json()
+            if r.status_code != 200:
+                print('Unable to delete storage profile',i,'status code',r.status_code)
+            else:
+                print('Storage Profile',i,'deleted')
