@@ -64,7 +64,7 @@ class Blueprint(object):
         else:
             table.add_row([j['name'], j['createdBy'], j['updatedAt']])
         print(table)
-        return
+        return j
 
     @staticmethod
     def list_detail(session, bps):
@@ -72,7 +72,16 @@ class Blueprint(object):
             uri= f'/blueprint/api/blueprints/{i}'
             r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
             j = r.json()
-            print(j['id'])
+            return j
+
+
+    @staticmethod
+    def create(session, jsonfile):
+        bp = open(jsonfile).read()
+        uri= f'/blueprint/api/blueprints'
+        r = requests.post(f'{session.baseurl}{uri}', data = bp, headers = session.headers)
+        print(r.status_code)
+        return r
 
     @staticmethod
     def delete(session, bps):
