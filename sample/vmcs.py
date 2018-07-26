@@ -335,3 +335,26 @@ class ImageMapping(object):
                 print('Unable to delete image profiles status code',r.status_code)
             else:
                 print('Image Profile deleted')
+
+class FlavorMapping(object):
+    @staticmethod
+    def list(session):
+        uri = '/iaas/flavor-profiles'
+        r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
+        j = r.json()
+        data = list()
+        if r.status_code != 200:
+            print('Unable to list network profiles, status code',r.status_code)
+        else:
+            return j
+
+    @staticmethod
+    def delete(session, mappings):
+        for i in mappings:
+            id = i['id']
+            uri = f'/iaas/flavor-profiles/{id}'
+            r = requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
+            if r.status_code != 200:
+                print('Unable to delete flavor profiles status code',r.status_code)
+            else:
+                print('Flavor Profile deleted')
