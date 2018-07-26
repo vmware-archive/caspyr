@@ -136,8 +136,8 @@ class CloudAccount(object):
         j = r.json()
         data = list()
         table = PrettyTable(['CloudAccountID'])
-        for i in j['links']:
-            i =i.lstrip('/iaas/cloud-accounts')
+        for i in j:
+            i =i['selfLink'].lstrip('/iaas/cloud-accounts')
             data.append(i)
             table.add_row([i])
         print(table)
@@ -146,7 +146,7 @@ class CloudAccount(object):
     @staticmethod
     def delete(session, accounts):
         for account in accounts:
-            uri = f'/iaas/cloud-accounts/{account.id}'
+            uri = f'/iaas/cloud-accounts/{account}'
             r = requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
             print(r.status_code)
         return
