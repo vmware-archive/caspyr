@@ -2,6 +2,7 @@
 import requests
 import json
 import os
+import argparse
 from prettytable import PrettyTable
 
 
@@ -76,12 +77,31 @@ class Blueprint(object):
 
 
     @staticmethod
-    def create(session, jsonfile):
+    def createFromJSON(session, jsonfile):
         bp = open(jsonfile).read()
         uri= f'/blueprint/api/blueprints'
         r = requests.post(f'{session.baseurl}{uri}', data = bp, headers = session.headers)
         print(r.status_code)
         return r
+
+    @staticmethod
+    def create(session, bpname, displayname, description, number, raw_data_url):
+        uri= f'/blueprint/api/blueprints'
+        data = requests.get(raw_data_url)
+        data_string = data.text
+        jsondata = {}
+        jsondata['name'] = bpname
+        jsondata['displayName'] = displayname
+        jsondata['description']  = description
+        jsondata['iteration'] = number
+        jsondata['tags'] = []
+        jsondata['content'] = data_string
+        r = requests.post(f'{session.baseurl}{uri}', data = json.dumps(jsondata), headers = session.headers)
+        if r.status_code != 201:
+            print("BP Format Error - Check Content and resubmit")
+        else:
+            print(jsondata['displayName'] + " has been created")
+        return r.content
 
     @staticmethod
     def delete(session, bps):
