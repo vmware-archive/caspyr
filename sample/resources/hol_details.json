@@ -14,7 +14,7 @@
       "aws_access_key" : "",
       "azure_subscription_id" : "",
       "azure_tenant_id" : "",
-      "azure_client_application_id" : "",
+      "azure_client_application_id": "",
       "azure_client_application_secret_key" : ""
     },
     "HOL-1902-T3" : {

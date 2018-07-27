@@ -1,0 +1,15 @@
+inputs: {}
+resources:
+  Cloud_Machine_1:
+    type: Cloud.Machine
+    properties:
+      image: Ubuntu
+      flavor: Small
+      networks:
+        - name: '${Cloud_Network_1.name}'
+  Cloud_Network_1:
+    type: Cloud.Network
+    properties:
+      name: AWS-East
+      networkType: existing
+      outboundAccess: true
