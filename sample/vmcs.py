@@ -2,7 +2,6 @@
 import requests
 import json
 import os
-import argparse
 from prettytable import PrettyTable
 
 
