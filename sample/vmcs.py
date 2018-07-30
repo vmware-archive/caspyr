@@ -2,6 +2,7 @@
 import requests
 import json
 import os
+import sys
 from prettytable import PrettyTable
 
 
@@ -179,6 +180,102 @@ class CloudAccount(object):
             print(r.status_code)
         return
 
+    @staticmethod
+    def createAWS(session, name, access_key, secret_key, regions = 'us-west-1', create_zone = False, description = ''):
+        print('Creating AWS Cloud Account',name)
+        body = {
+            "name": name,
+            "description": description,
+            "accessKeyId": access_key,
+            "secretAccessKey": secret_key,
+            "regionIds": [regions],
+            "createDefaultZones": create_zone
+        }
+        uri = '/iaas/cloud-accounts-aws'
+        try:
+            r = requests.post(f'{session.baseurl}{uri}', headers = session.headers, data = json.dumps(body))
+            j=r.json()
+            print('Cloud Account',name,'created')
+            return j
+        except requests.exceptions.HTTPError as e:
+            print(e)
+            sys.exit(1)
+
+    @staticmethod
+    def createAzure(session, name, subscription_id, tenant_id, application_id, application_key, regions = 'West US', create_zone = False, description = ''):
+        print('Creating Azure Cloud Account',name)
+        body = {
+            "name": name,
+            "description": description,
+            "subscriptionId": subscription_id,
+            "tenantId": tenant_id,
+            "clientApplicationId": application_id,
+            "clientApplicationSecretKey": application_key,
+            "regionIds": [regions],
+            "createDefaultZones": create_zone
+        }
+        uri = '/iaas/cloud-accounts-azure'
+        try:
+            r = requests.post(f'{session.baseurl}{uri}', headers = session.headers, data = json.dumps(body))
+            r.raise_for_status()
+            j=r.json()
+            print('Cloud Account',name,'created')
+            return j
+        except requests.exceptions.HTTPError as e:
+            print(e)
+            sys.exit(1)
+
+    @staticmethod
+    def createvSphere(session, name, fqdn, rdc, username, password, datacenter_moid, nsx_cloud_account='', description = ''):
+        print('Creating vSphere Cloud Account',name)
+        body = {
+            "name": name,
+            "description": description,
+            "hostName": fqdn,
+            "acceptSelfSignedCertificate": True,
+            "linkedCloudAccountLink": nsx_cloud_account,
+            "dcid": rdc,
+            "username": username,
+            "password": password,
+            "regionIds": datacenter_moid,
+            "createDefaultZones": False
+            }
+        uri = '/iaas/cloud-accounts-azure'
+        try:
+            r = requests.post(f'{session.baseurl}{uri}', headers = session.headers, data = json.dumps(body))
+            r.raise_for_status()
+            j=r.json()
+            print('Cloud Account',name,'created')
+            return j
+        except requests.exceptions.HTTPError as e:
+            print(e)
+            sys.exit(1)
+
+    @staticmethod
+    def createNSXT(session, name, fqdn, rdc, username, password, description = ''):
+        print('Creating NSX-T Cloud Account',name)
+        body = {
+            "name": name,
+            "description": description,
+            "hostName": fqdn,
+            "acceptSelfSignedCertificate": True,
+            "dcid": rdc,
+            "username": username,
+            "password": password,
+            "createDefaultZones": False
+            }
+        uri = '/iaas/cloud-accounts-azure'
+        try:
+            r = requests.post(f'{session.baseurl}{uri}', headers = session.headers, data = json.dumps(body))
+            r.raise_for_status()
+            j=r.json()
+            print('Cloud Account',name,'created')
+            return j
+        except requests.exceptions.HTTPError as e:
+            print(e)
+            sys.exit(1)
+
+
 class Project(object):
     """
     Class for Project methods"
@@ -241,6 +338,9 @@ class CloudZone(object):
     """
     Classes for Cloud Zone methods.
     """
+    def __init__(self):
+        pass
+
     @staticmethod
     def list(session, pt=False):
         """Takes a single input of your session bearer token"""
@@ -255,6 +355,28 @@ class CloudZone(object):
         if pt == 'pt':
             print(table)
         return data
+
+    @staticmethod
+    def create(session, name, region_id, placement_policy = 'DEFAULT', tags = [], tags_to_match = [], description = ''):
+        uri = '/iaas/zones'
+        body = {
+            "name": name,
+            "description": description,
+            "regionId": region_id,
+            "placementPolicy": placement_policy,
+            "tags": tags,
+            "tagsToMatch": tags_to_match
+        }
+        try:
+            r = requests.post(f'{session.baseurl}{uri}', headers = session.headers, data = json.dumps(body))
+            r.raise_for_status()
+            j=r.json()
+            print('Cloud Zone',name,'created')
+            return j
+        except requests.exceptions.HTTPError as e:
+            print(e)
+            sys.exit(1)
+
 
 class Deployment(object):
     """
@@ -370,7 +492,6 @@ class FlavorMapping(object):
         uri = '/iaas/flavor-profiles'
         r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
         j = r.json()
-        data = list()
         if r.status_code != 200:
             print('Unable to list network profiles, status code',r.status_code)
         else:
