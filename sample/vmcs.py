@@ -16,11 +16,11 @@ class Session(object):
     def __init__(self, auth_token):
         self.token = 'Bearer '+auth_token
         self.headers = {'Content-Type':'application/json','authorization': self.token}
-        self.baseurl = 'https://www.mgmt.cloud.vmware.com'
+        self.baseurl = 'https://api.mgmt.cloud.vmware.com'
 
     @classmethod
     def login(self, refresh_token):
-            baseurl = 'https://www.mgmt.cloud.vmware.com'
+            baseurl = 'https://api.mgmt.cloud.vmware.com'
             uri = '/iaas/login'
             headers = {'Content-Type':'application/json'}
             payload = json.dumps({"refreshToken": refresh_token })
@@ -44,15 +44,11 @@ class Blueprint(object):
         uri = '/blueprint/api/blueprints/'
         r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
         j = r.json()
-        bps = list()
-        table = PrettyTable(['BlueprintID'])
+        data = list()
         for i in j['links']:
             i = os.path.split(i)[1]
-            bps.append(i)
-            table.add_row([i])
-        if pt == 'pt':
-            print(table)
-        return bps
+            data.append(i)
+        return data
 
     @staticmethod
     def describe(session, bp):
@@ -68,7 +64,7 @@ class Blueprint(object):
         return j
 
     @staticmethod
-    def list_detail(session, bps):
+    def detail(session, bps):
         for i in bps:
             uri= f'/blueprint/api/blueprints/{i}'
             r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
@@ -164,18 +160,16 @@ class CloudAccount(object):
         r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
         j = r.json()
         data = list()
-        table = PrettyTable(['CloudAccountID'])
         for i in j:
-            i =i['selfLink'].lstrip('/iaas/cloud-accounts')
+            i = i['selfLink']
+            i = os.path.split(i)[1]
             data.append(i)
-            table.add_row([i])
-        print(table)
         return data
 
     @staticmethod
     def delete(session, accounts):
         for account in accounts:
-            uri = f'/iaas/cloud-accounts/{account}'
+            uri = f'/api/cloud-accounts/{account}'
             r = requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
             print(r.status_code)
         return
@@ -202,7 +196,7 @@ class CloudAccount(object):
             sys.exit(1)
 
     @staticmethod
-    def createAzure(session, name, subscription_id, tenant_id, application_id, application_key, regions = 'West US', create_zone = False, description = ''):
+    def createAzure(session, name, subscription_id, tenant_id, application_id, application_key, regions = 'westus', create_zone = False, description = ''):
         print('Creating Azure Cloud Account',name)
         body = {
             "name": name,
@@ -298,8 +292,7 @@ class Project(object):
     def delete(session, projects):
         data = list()
         for i in projects:
-            id = i['id']
-            uri = f'/iaas/projects/{id}'
+            uri = f'/iaas/projects/{i}'
             r = requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
             data.append({'id':id,'response':r.status_code})
         return data
@@ -507,3 +500,105 @@ class FlavorMapping(object):
                 print('Unable to delete flavor profiles status code',r.status_code)
             else:
                 print('Flavor Profile deleted')
+
+class Org():
+
+    @staticmethod
+    def invite(session, org_id, username):
+        body = {
+            "orgId": org_id,
+            "usernames": [
+                username
+            ],
+            "mandatoryOrgRole": "org_owner",
+            "addOnRoles": [],
+            "orgServicesRoles": [
+                {
+                "serviceName": "VMware Cloud Assembly",
+                "serviceType": "EXTERNAL",
+                "serviceDefinitionLink": "/csp/gateway/slc/api/definitions/external/Zy924mE3dwn2ASyVZR0Nn7lupeA_",
+                "serviceRolesNames": [
+                    "automationservice:user",
+                    "automationservice:manager",
+                    "automationservice:cloud_admin"
+                ]
+                },
+                {
+                "serviceDefinitionLink": "/csp/gateway/slc/api/definitions/external/ulvqtN4141beCT2oOnbj-wlkzGg_",
+                "serviceRolesNames": [
+                    "CodeStream:administrator",
+                    "CodeStream:viewer",
+                    "CodeStream:developer"
+                ]
+                },
+                {
+                "serviceDefinitionLink": "/csp/gateway/slc/api/definitions/external/Yw-HyBeQzjCXkL2wQSeGwauJ-mA_",
+                "serviceRolesNames": [
+                    "catalog:admin",
+                    "catalog:user"
+                ]
+                }
+            ]
+        }
+        uri = f'/csp/gateway/portal/api/orgs/{org_id}/invitations'
+        try:
+            r = requests.post(f'{session.baseurl}{uri}', headers = session.headers, data = json.dumps(body))
+            r.raise_for_status()
+            j=r.json()
+            print('User',username,'invited to org',org_id)
+            return j
+        except requests.exceptions.HTTPError as e:
+            print(e)
+            sys.exit(1)
+
+    @staticmethod
+    def user_list(session, org_id):
+        uri = f'/csp/gateway/portal/api/orgs/{org_id}/users'
+        try:
+            r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
+            r.raise_for_status()
+            j=r.json()
+            #print('User',username,'invited to org',org_id)
+            return j
+        except requests.exceptions.HTTPError as e:
+            print(e)
+            sys.exit(1)
+
+"""
+{
+    "orgRoleName": "org_owner",
+    "orgRoleNames": [ "" ],
+    "serviceRolesDtos": [ {
+        "serviceDefinitionLink": "/csp/gateway/slc/api/definitions/external/Zy924mE3dwn2ASyVZR0Nn7lupeA_",
+        "serviceRoleNames": [ "automationservice:user","automationservice:manager","automationservice:cloud_admin" ]
+    },
+    {
+        "serviceDefinitionLink": "/csp/gateway/slc/api/definitions/external/ulvqtN4141beCT2oOnbj-wlkzGg_",
+        "serviceRoleNames": ["CodeStream:administrator","CodeStream:viewer","CodeStream:developer"]
+    },
+    {
+        "serviceDefinitionLink": "/csp/gateway/slc/api/definitions/external/Yw-HyBeQzjCXkL2wQSeGwauJ-mA_",
+        "serviceRoleNames": ["catalog:admin","catalog:user"]
+    } ],
+    "usernames": [ "grant.a.orchard@gmail.com" ]
+}
+
+
+ "serviceRolesDtos": [
+                {
+                "serviceDefinitionLink": "/csp/gateway/slc/api/definitions/external/Zy924mE3dwn2ASyVZR0Nn7lupeA_",
+                "serviceRolesNames": ["automationservice:user","automationservice:manager","automationservice:cloud_admin"]
+                },
+                {
+                "serviceDefinitionLink": "/csp/gateway/slc/api/definitions/external/ulvqtN4141beCT2oOnbj-wlkzGg_",
+                "serviceRolesNames": ["CodeStream:administrator","CodeStream:viewer","CodeStream:developer"]
+                },
+                {
+                "serviceDefinitionLink": "/csp/gateway/slc/api/definitions/external/Yw-HyBeQzjCXkL2wQSeGwauJ-mA_",
+                "serviceRolesNames": ["catalog:admin","catalog:user"]
+                }
+            ]
+        }
+    69016f57-9ebd-4abc-99ee-7492196ee132
+}
+"""
