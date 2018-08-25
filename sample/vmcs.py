@@ -24,13 +24,14 @@ class Session(object):
             uri = '/iaas/login'
             headers = {'Content-Type':'application/json'}
             payload = json.dumps({"refreshToken": refresh_token })
-            r = requests.post(f'{baseurl}{uri}', headers = headers, data = payload)
-            if r.status_code != 200:
-                print(f'Unsuccessful Login Attempt. Error code {r.status_code}')
-            else:
-                print('Login successful. ')
+            try:
+                r = requests.post(f'{baseurl}{uri}', headers = headers, data = payload)
+                print('Login successful.')
                 auth_token = r.json()['token']
                 return self(auth_token)
+            except requests.exceptions.HTTPError as e:
+                print(e)
+                sys.exit(1)
 
 class Blueprint(object):
     """
@@ -40,7 +41,7 @@ class Blueprint(object):
         pass
 
     @staticmethod
-    def list(session, pt=False):
+    def list(session):
         uri = '/blueprint/api/blueprints/'
         r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
         j = r.json()
@@ -64,12 +65,12 @@ class Blueprint(object):
         return j
 
     @staticmethod
-    def detail(session, bps):
-        for i in bps:
-            uri= f'/blueprint/api/blueprints/{i}'
-            r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
-            j = r.json()
-            return j
+    def detail(session, bp):
+        uri= f'/blueprint/api/blueprints/{bp}'
+        print(uri)
+        r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
+        j = r.json()
+        return j
 
 
     @staticmethod
@@ -100,12 +101,9 @@ class Blueprint(object):
         return r.content
 
     @staticmethod
-    def delete(session, bps):
-        print(bps)
-        for bp in bps:
-            uri= f'/blueprint/api/blueprints/{bp}'
-            r = requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
-            print(r.status_code)
+    def delete(session, id):
+        uri= f'/blueprint/api/blueprints/{id}'
+        requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
         return
 
     @staticmethod
@@ -114,38 +112,34 @@ class Blueprint(object):
         r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
         j = r.json()
         data = list()
-        table = PrettyTable(['RequestID'])
         for i in j['links']:
             i = os.path.split(i)[1]
-            #n = n.lstrip('/blueprint/api/blueprint-request')
             data.append(i)
-            table.add_row([i])
-        print(table)
         return data
 
     @staticmethod
-    def request_detail(session, bp_requests):
-        data = list()
-        table = PrettyTable(['DeploymentId', 'DeploymentName', 'Status'])
-        for i in bp_requests:
-            uri = f'/blueprint/api/blueprint-requests/{i}'
-            r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
-            j = r.json()
-            data.append(j)
-            table.add_row([j['deploymentId'],j['deploymentName'],j['status']])
-        print(table)
-        return data
+    def request_detail(session, id):
+        #data = list()
+        uri = f'/blueprint/api/blueprint-requests/{id}'
+        r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
+        j = r.json()
+        #data.append(j)
+        return j
 
     @staticmethod
-    def request_cancel(session, ids):
-        for i in ids:
-            uri = f'/blueprint/api/blueprint-requests/{i}?action=cancel'
-            payload = {}
-            r = requests.post(f'{session.baseurl}{uri}', headers = session.headers, data = payload)
-            if r.status_code == 204:
-                print('Successfully cancelled request')
-            else:
-                print('Cancellation failed with',r.status_code)
+    def request_cancel(session, id):
+        uri = f'/blueprint/api/blueprint-requests/{id}?action=cancel'
+        payload = {}
+        try:
+            requests.post(f'{session.baseurl}{uri}', headers = session.headers, data = payload)
+        except requests.exceptions.HTTPError as e:
+            print(e)
+            sys.exit(1)
+        #if r.status_code == 204:
+        #    print('Successfully cancelled request')
+        #else:
+        #    print('Cancellation failed with',r.status_code)
+        return
 
 class CloudAccount(object):
     """
@@ -167,11 +161,46 @@ class CloudAccount(object):
         return data
 
     @staticmethod
-    def delete(session, accounts):
-        for account in accounts:
-            uri = f'/api/cloud-accounts/{account}'
-            r = requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
-            print(r.status_code)
+    def listaws(session):
+        uri = '/iaas/cloud-accounts-aws'
+        r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
+        j = r.json()
+        data = list()
+        for i in j:
+            i = i['selfLink']
+            i = os.path.split(i)[1]
+            data.append(i)
+        return data
+
+    @staticmethod
+    def listazure(session):
+        uri = '/iaas/cloud-accounts-azure'
+        r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
+        j = r.json()
+        data = list()
+        for i in j:
+            i = i['selfLink']
+            i = os.path.split(i)[1]
+            data.append(i)
+        return data
+
+    @staticmethod
+    def listvsphere(session):
+        uri = '/iaas/cloud-accounts-vsphere'
+        r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
+        j = r.json()
+        data = list()
+        for i in j:
+            i = i['selfLink']
+            i = os.path.split(i)[1]
+            data.append(i)
+        return data
+
+    @staticmethod
+    def delete(session, id):
+        uri = f'/api/cloud-accounts/{id}'
+        r = requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
+        print(r.status_code)
         return
 
     @staticmethod
@@ -289,13 +318,17 @@ class Project(object):
         return data
 
     @staticmethod
-    def delete(session, projects):
-        data = list()
-        for i in projects:
-            uri = f'/iaas/projects/{i}'
-            r = requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
-            data.append({'id':id,'response':r.status_code})
-        return data
+    def delete(session, id):
+        uri = f'/iaas/projects/{id}'
+        requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
+        return
+
+    @staticmethod
+    def removezones(session, id):
+        uri = f'/iaas/projects/{id}'
+        data = {}
+        data['zoneAssignmentConfigurations'] = []
+        requests.patch(f'{session.baseurl}{uri}', headers = session.headers, json = data)
 
 
 class DataCollector(object):
@@ -314,18 +347,11 @@ class DataCollector(object):
         return j
 
     @staticmethod
-    def delete(session, collectors):
-        data = list()
-        for i in collectors:
-            id = i['dcId']
-            uri = f'/api/data-collector/{id}'
-            r = requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
-            if r.status_code != 200:
-                print("Unable to delete data collector",i['name'],"status code",r.status_code)
-            else:
-                print("Deleted data collector",i['name'])
-                data.append(i)
-            return data
+    def delete(session, i):
+        id = i['dcId']
+        uri = f'/api/data-collector/{id}'
+        requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
+        return
 
 class CloudZone(object):
     """
@@ -335,23 +361,21 @@ class CloudZone(object):
         pass
 
     @staticmethod
-    def list(session, pt=False):
+    def list(session):
         """Takes a single input of your session bearer token"""
         uri = '/iaas/zones/'
-        r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
-        j = r.json()
-        data = list()
-        table = PrettyTable(['ID','Name'])
-        for i in j:
-            data.append(i)
-            table.add_row([i['id'],i['name']])
-        if pt == 'pt':
-            print(table)
-        return data
+        try:
+            r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
+            j = r.json()
+            print(j)
+            return j
+        except requests.exceptions.HTTPError as e:
+            print(e)
+            sys.exit(1)
 
     @staticmethod
     def create(session, name, region_id, placement_policy = 'DEFAULT', tags = [], tags_to_match = [], description = ''):
-        uri = '/iaas/zones'
+        uri = '/iaas/zones/'
         body = {
             "name": name,
             "description": description,
@@ -370,6 +394,14 @@ class CloudZone(object):
             print(e)
             sys.exit(1)
 
+    @staticmethod
+    def delete(session, id):
+        uri = f'/iaas/zones/{id}'
+        try:
+            requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
+        except requests.exceptions.HTTPError as e:
+            print(e)
+            sys.exit(1)
 
 class Deployment(object):
     """
@@ -382,20 +414,14 @@ class Deployment(object):
         r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
         j = r.json()
         data = list()
-        for i in j:
-            data.append(i)
+        for i in j['results']:
+            data.append(i['id'  ])
         return data
 
     @staticmethod
-    def delete(session, deployments):
-        for i in deployments:
-            id = i['id']
-            uri = f'/deployment/api/deployments/{id}'
-            r = requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
-            if r.status_code != 200:
-                print("Unable to delete",i['name'],"status code",r.status_code)
-            else:
-                print("Deleted deployment",i['name'])
+    def delete(session, id):
+        uri = f'/deployment/api/deployments/{id}'
+        requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
 
 class NetworkProfile(object):
     """
@@ -416,68 +442,115 @@ class NetworkProfile(object):
                 data.append(i)
         return data
 
+
     @staticmethod
-    def delete(session, network_profiles):
-        data = list()
-        for i in network_profiles:
-            id = i['id']
-            uri = f'/iaas/network-profiles/{id}'
-            print(uri)
+    def delete(session, id):
+        for i in id:
+            uri = f'/iaas/network-profiles/{i}'
             r = requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
             if r.status_code != 200:
                 print('Unable to delete network profile',i['name'],'status code',r.status_code)
-            else:
-                data.append(i['name'])
-        print(len(data),'networks deleted')
-        return data
+        return
 
 class StorageProfile(object):
     @staticmethod
     def list(session):
-        uri = '/provisioning/resources/storage-profiles'
+        uri = '/iaas/storage-profiles'
         r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
         j = r.json()
-        data = list()
         if r.status_code != 200:
             print('Unable to list storage profiles, status code',r.status_code)
-        else:
-            print(len(j['documentLinks']),'storage profiles found')
-            for i in j['documentLinks']:
-                i = os.path.split(i)[1]
-                data.append(i)
-        return data
+        return j
+
+    @staticmethod
+    def list_azure(session):
+        uri = '/iaas/storage-profiles-azure'
+        r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
+        j = r.json()
+        if r.status_code != 200:
+            print('Unable to list storage profiles, status code',r.status_code)
+        return j
+
+    @staticmethod
+    def list_aws(session):
+        uri = '/iaas/storage-profiles-aws'
+        try:
+            r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
+            j = r.json()
+        except requests.exceptions.HTTPError as e:
+            print(e)
+            sys.exit(1)
+        return j
+
+    @staticmethod
+    def list_vsphere(session):
+        uri = '/iaas/storage-profiles-vsphere'
+        try:
+            r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
+            j = r.json()
+        except requests.exceptions.HTTPError as e:
+            print(e)
+            sys.exit(1)
+        return j
 
     @staticmethod
     def delete(session, profiles):
         for i in profiles:
             uri = f'/provisioning/resources/storage-profiles/{i}'
-            r = requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
-            if r.status_code != 200:
-                print('Unable to delete storage profile',i,'status code',r.status_code)
-            else:
-                print('Storage Profile',i,'deleted')
+            try:
+                requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
+            except requests.exceptions.HTTPError as e:
+                print(e)
+                sys.exit(1)
+
+    @staticmethod
+    def delete_aws(session, id):
+        uri = '/iaas/storage-profiles-aws/{id}'
+        try:
+            requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
+        except requests.exceptions.HTTPError as e:
+            print(e)
+            sys.exit(1)
+        return
+
+    @staticmethod
+    def delete_azure(session, id):
+        uri = f'/iaas/storage-profiles-azure/{id}'
+        try:
+            requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
+        except requests.exceptions.HTTPError as e:
+            print(e)
+            sys.exit(1)
+        return
+
+    @staticmethod
+    def delete_vsphere(session, id):
+        uri = f'/iaas/storage-profiles-vsphere/{id}'
+        try:
+            requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
+        except requests.exceptions.HTTPError as e:
+            print(e)
+            sys.exit(1)
+        return
 
 class ImageMapping(object):
     @staticmethod
     def list(session):
-        uri = '/provisioning/mgmt/image-profiles'
+        uri = '/iaas/image-profiles'
         r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
         j = r.json()
         if r.status_code != 200:
             print('Unable to list image profiles, status code',r.status_code)
-        else:
-            print(j['totalCount'],'image profiles found (each profile may contain many maps)')
         return j
 
     @staticmethod
-    def delete(session, mappings):
-        for i in mappings['documentLinks']:
-            uri = f'{i}'
-            r = requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
-            if r.status_code != 200:
-                print('Unable to delete image profiles status code',r.status_code)
-            else:
-                print('Image Profile deleted')
+    def delete(session, i):
+        uri = f'/iaas/image-profiles/{i}'
+        r = requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
+        if r.status_code != 200:
+            print('Unable to delete image profiles status code',r.status_code)
+        return
+
 
 class FlavorMapping(object):
     @staticmethod
@@ -486,20 +559,18 @@ class FlavorMapping(object):
         r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
         j = r.json()
         if r.status_code != 200:
-            print('Unable to list network profiles, status code',r.status_code)
+            print('Unable to list flavor profiles, status code',r.status_code)
         else:
             return j
 
     @staticmethod
-    def delete(session, mappings):
-        for i in mappings:
-            id = i['id']
-            uri = f'/iaas/flavor-profiles/{id}'
-            r = requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
-            if r.status_code != 200:
-                print('Unable to delete flavor profiles status code',r.status_code)
-            else:
-                print('Flavor Profile deleted')
+    def delete(session, id):
+        uri = f'/iaas/flavor-profiles/{id}'
+        r = requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
+        if r.status_code != 200:
+            print('Unable to delete flavor profiles status code',r.status_code)
+        else:
+            print('Flavor Profile deleted')
 
 class Org():
 
