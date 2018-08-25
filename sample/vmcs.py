@@ -635,6 +635,40 @@ class Org():
             print(e)
             sys.exit(1)
 
+
+class CodeStream(object):
+    @staticmethod
+    def endpoint_list(session):
+        pass
+
+    @staticmethod
+    def endpoint_delete(session, id):
+        pass
+
+    @staticmethod
+    def pipeline_list(session):
+        pass
+
+    @staticmethod
+    def pipeline_delete(session, id):
+        pass
+
+    @staticmethod
+    def pipeline_execute(session, id):
+        pass
+
+    @staticmethod
+    def pipeline_cancel(session, id):
+        pass
+
+    @staticmethod
+    def pipeline_status(session, id):
+        pass
+
+
+
+
+
 """
 {
     "orgRoleName": "org_owner",
