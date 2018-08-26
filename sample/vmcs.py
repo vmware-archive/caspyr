@@ -426,6 +426,7 @@ class CloudZone(object):
         try:
             r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
             j = r.json()
+            r.raise_for_status()
             return j
         except requests.exceptions.HTTPError as e:
             print(e)
@@ -456,10 +457,10 @@ class CloudZone(object):
     def delete(session, id):
         uri = f'/iaas/zones/{id}'
         try:
-            requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
+            r = requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
+            r.raise_for_status()
         except requests.exceptions.HTTPError as e:
             print(e)
-            sys.exit(1)
 
 class Deployment(object):
     """
@@ -585,7 +586,8 @@ class StorageProfile(object):
     def delete_vsphere(session, id):
         uri = f'/iaas/storage-profiles-vsphere/{id}'
         try:
-            requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
+            r = requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
+            r.raise_for_status()
         except requests.exceptions.HTTPError as e:
             print(e)
             sys.exit(1)
@@ -595,11 +597,13 @@ class ImageMapping(object):
     @staticmethod
     def list(session):
         uri = '/iaas/image-profiles'
-        r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
-        j = r.json()
-        if r.status_code != 200:
-            print('Unable to list image profiles, status code',r.status_code)
-        return j
+        try:
+            r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
+            r.raise_for_status()
+            j = r.json()
+            return j
+        except requests.exceptions.HTTPError as e:
+            print(e)
 
     @staticmethod
     def delete(session, i):
@@ -639,7 +643,7 @@ class Org():
             "usernames": [
                 username
             ],
-            "mandatoryOrgRole": "org_owner",
+            "mandatoryOrgRole": "org_member",
             "addOnRoles": [],
             "orgServicesRoles": [
                 {
@@ -687,15 +691,72 @@ class Org():
             r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
             r.raise_for_status()
             j=r.json()
-            #print('User',username,'invited to org',org_id)
             return j
         except requests.exceptions.HTTPError as e:
             print(e)
             sys.exit(1)
 
+
+class CodeStream(object):
+    @staticmethod
+    def endpoint_list(session):
+        uri = f'/pipeline/api/endpoints'
+        try:
+            data = list()
+            r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
+            r.raise_for_status()
+            j=r.json()
+            print(j)
+        except requests.exceptions.HTTPError as e:
+            print(e)
+            sys.exit(1)
+        return data
+
+    @staticmethod
+    def endpoint_delete(session, id):
+        pass
+
+    @staticmethod
+    def pipeline_list(session):
+        pass
+
+    @staticmethod
+    def pipeline_delete(session, id):
+        pass
+
+    @staticmethod
+    def pipeline_execute(session, id):
+        pass
+
+    @staticmethod
+    def pipeline_cancel(session, id):
+        pass
+
+    @staticmethod
+    def pipeline_status(session, id):
+        pass
+
+class ServiceBroker(object):
+    @staticmethod
+    def sources_list(session):
+        uri = f'/library/api/admin/sources'
+        try:
+            data = list()
+            r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
+            r.raise_for_status()
+            j=r.json()
+            print(j)
+        except requests.exceptions.HTTPError as e:
+            print(e)
+            sys.exit(1)
+        return data
+
+
+
+
 """
 {
-    "orgRoleName": "org_owner",
+    "orgRoleName": "org_member",
     "orgRoleNames": [ "" ],
     "serviceRolesDtos": [ {
         "serviceDefinitionLink": "/csp/gateway/slc/api/definitions/external/Zy924mE3dwn2ASyVZR0Nn7lupeA_",
