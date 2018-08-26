@@ -360,17 +360,15 @@ class Project(object):
                         ]
                         }
                 uri = f'/iaas/projects/{v}'
-                print(data)
-                print(uri)
                 r = requests.patch(f'{session.baseurl}{uri}', headers = session.headers, json = data)
-                print("done")
+                print(r.status_code)
                 break
         else:
             status = "Unable to find project name"
             return print(status)
 
     @staticmethod
-    def patchallzones(session):
+    def patchallzones(session,name):
         ids = []
         zones = CloudZone.list(session)
         for j in zones:
@@ -378,12 +376,16 @@ class Project(object):
         data = {"zoneAssignmentConfigurations": ids}
         projects = Project.list(session)
         for proj in projects:
-            if proj['name'] == "RainPole":
+            if proj['name'] == name:
                 projid = proj['id']
                 uri = f'/iaas/projects/{projid}'
                 r = requests.patch(f'{session.baseurl}{uri}', headers = session.headers, json = data)
+                print(r.status_code)
                 return r.status_code
                 break
+        else:
+            print(f'Content not found for name {name}')
+            return
 
             
             
@@ -424,7 +426,6 @@ class CloudZone(object):
         try:
             r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
             j = r.json()
-            print(j)
             return j
         except requests.exceptions.HTTPError as e:
             print(e)
