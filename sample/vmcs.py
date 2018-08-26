@@ -330,7 +330,66 @@ class Project(object):
         data['zoneAssignmentConfigurations'] = []
         requests.patch(f'{session.baseurl}{uri}', headers = session.headers, json = data)
 
+    @staticmethod
+    def create(session, name, description):
+        uri = '/iaas/projects/'
+        data = {
+                'name' : name,
+                'description' : description,
+                }
+        print(data)
+        r = requests.post(f'{session.baseurl}{uri}', headers = session.headers, json = data)
+        if r.status_code == 201:
+            content = f'{name} project has been created'
+            return print(content)
+        else:
+            content = f'Error executing: Code {r.status_code}'
+            return print(content)
 
+    @staticmethod
+    def patch(session, name):
+        proj = Project.list(session)
+        for i in proj:
+            if i['name'] == name:
+                v = i['id']
+                zone = CloudZone.list(session)[0]['id']
+                data = {"zoneAssignmentConfigurations": [
+                            {
+                            "zoneId": zone,
+                            }
+                        ]
+                        }
+                uri = f'/iaas/projects/{v}'
+                r = requests.patch(f'{session.baseurl}{uri}', headers = session.headers, json = data)
+                print(r.status_code)
+                break
+        else:
+            status = "Unable to find project name"
+            return print(status)
+
+    @staticmethod
+    def patchallzones(session,name):
+        ids = []
+        zones = CloudZone.list(session)
+        for j in zones:
+            ids.append({"zoneId": j['id']})
+        data = {"zoneAssignmentConfigurations": ids}
+        projects = Project.list(session)
+        for proj in projects:
+            if proj['name'] == name:
+                projid = proj['id']
+                uri = f'/iaas/projects/{projid}'
+                r = requests.patch(f'{session.baseurl}{uri}', headers = session.headers, json = data)
+                print(r.status_code)
+                return r.status_code
+                break
+        else:
+            print(f'Content not found for name {name}')
+            return
+
+            
+            
+            
 class DataCollector(object):
     """
     Classes for Remote Data Collector methods.
