@@ -1,9 +1,12 @@
-"""Initial structure for classes and functions as they pertain to VMCS automation functions."""
+"""
+Initial structure for classes and functions as they pertain to VMCS automation functions.
+"""
+
 import requests
 import json
 import os
 import sys
-from prettytable import PrettyTable
+from abc import ABCMeta, abstractmethod
 
 
 class Session(object):
@@ -33,16 +36,42 @@ class Session(object):
                 print(e)
                 sys.exit(1)
 
-class Blueprint(object):
+class Request(object):
     """
-    Classes for Blueprint methods.
+    Class for request methods.
     """
-    def __init__(self):
-        pass
 
-    @staticmethod
-    def list(session):
-        uri = '/blueprint/api/blueprints/'
+    def __init__(self, request):
+        self.id = request['id']
+        self.deployment_name = request['deploymentName']
+        self.deployment_id = request['deploymentId']
+        self.description = request['description']
+        self.type = request['type']
+        self.reason = request['reason']
+        self.plan = request['plan']
+        self.destroy = request['destroy']
+        self.blueprint_id = request['blueprintId']
+        self.inputs = request['inputs']
+        self.status = request['status']
+        self.project_name = request['projectName']
+        self.project_id = request['projectId']
+        self.created_at = request['createdAt']
+        self.created_by = request['createdBy']
+        self.updated_at = request['updatedAt']
+        self.updated_by = request['updatedBy']
+        self.request_tracker_link = request['requestTrackerLink']
+        self.flow_id = request['flowId']
+        self.flow_execution_id = request['flowExecutionId']
+        self.self_link = request['selfLink']
+        self.tenants = request['tenants']
+        if request['failureMessage']:
+            self.failure_message = request['failureMessage']
+        if request['validationMessages']:
+            self.validation_messages = request['validationMessages']
+
+    @classmethod
+    def list(cls, session):
+        uri = '/blueprint/api/blueprint-requests/'
         r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
         j = r.json()
         data = list()
@@ -51,38 +80,91 @@ class Blueprint(object):
             data.append(i)
         return data
 
+    @classmethod
+    def describe(cls, session, id):
+        uri = f'/blueprint/api/blueprint-requests/{id}'
+        try:
+            r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
+            j = r.json()
+            return cls(j)
+        except requests.exceptions.HTTPError as e:
+            print(e)
+
     @staticmethod
-    def describe(session, bp):
-        table = PrettyTable(['Name', 'CreatedBy', 'LastUpdated'])
+    def cancel(session, id):
+        uri = f'/blueprint/api/blueprint-requests/{id}?action=cancel'
+        try:
+            requests.post(f'{session.baseurl}{uri}', headers = session.headers)
+        except requests.exceptions.HTTPError as e:
+            print(e)
+        return
+
+
+class Blueprint(object):
+    """
+    Classes for Blueprint methods.
+
+    """
+    def __init__(self, blueprint):
+        self.name = blueprint['name']
+        self.description = blueprint['description']
+        self.tags = blueprint['tags']
+        self.content = blueprint['content']
+        self.valid = blueprint['valid']
+        self.validation_messages = blueprint['validationMessages']
+        self.status = blueprint['status']
+        self.project_id = blueprint['projectId']
+        self.project_name = blueprint['projectName']
+        self.type = blueprint['type']
+        self.id = blueprint['id']
+        self.self_link = blueprint['selfLink']
+        self.created_at = blueprint['createdAt']
+        self.created_by = blueprint['createdBy']
+        self.updated_at = blueprint['updatedAt']
+        self.updated_by = blueprint['updatedBy']
+        self.tenants = blueprint['tenants']
+
+
+    @staticmethod
+    def list(session):
+        uri = '/blueprint/api/blueprints/'
+        try:
+            r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
+            r.raise_for_status()
+            j = r.json()
+            data = list()
+            for i in j['links']:
+                i = os.path.split(i)[1]
+                data.append(i)
+            return data
+        except requests.exceptions.HTTPError as e:
+            print(e)
+
+    @classmethod
+    def describe(cls, session, bp):
         uri= f'/blueprint/api/blueprints/{bp}'
-        r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
-        j = r.json()
-        if r.status_code == 403:
-            print(f'You do not have sufficient access to org to list its details.')
-        else:
-            table.add_row([j['name'], j['createdBy'], j['updatedAt']])
-        print(table)
-        return j
-
-    @staticmethod
-    def detail(session, bp):
-        uri= f'/blueprint/api/blueprints/{bp}'
-        print(uri)
-        r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
-        j = r.json()
-        return j
+        try:
+            r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
+            r.raise_for_status()
+            j = r.json()
+            return cls(j)
+        except requests.exceptions.HTTPError as e:
+            print(e)
 
 
-    @staticmethod
-    def createFromJSON(session, jsonfile):
+    @classmethod
+    def createFromJSON(cls, session, jsonfile):
         bp = open(jsonfile).read()
         uri= f'/blueprint/api/blueprints'
-        r = requests.post(f'{session.baseurl}{uri}', data = bp, headers = session.headers)
-        print(r.status_code)
-        return r
+        try:
+            r = requests.post(f'{session.baseurl}{uri}', data = bp, headers = session.headers)
+            r.raise_for_status()
+            return cls(r.content)
+        except requests.exceptions.HTTPError as e:
+            print(e)
 
-    @staticmethod
-    def create(session, bpname, displayname, description, number, raw_data_url):
+    @classmethod
+    def create(cls, session, bpname, displayname, description, number, raw_data_url):
         uri= f'/blueprint/api/blueprints'
         data = requests.get(raw_data_url)
         data_string = data.text
@@ -93,118 +175,103 @@ class Blueprint(object):
         jsondata['iteration'] = number
         jsondata['tags'] = []
         jsondata['content'] = data_string
-        r = requests.post(f'{session.baseurl}{uri}', data = json.dumps(jsondata), headers = session.headers)
-        if r.status_code != 201:
-            print("BP Format Error - Check Content and resubmit")
-        else:
-            print(jsondata['displayName'] + " has been created")
-        return r.content
+        try:
+            r = requests.post(f'{session.baseurl}{uri}', data = json.dumps(jsondata), headers = session.headers)
+            r.raise_for_status()
+            return cls(r.content)
+        except requests.exceptions.HTTPError as e:
+            print(e)
 
     @staticmethod
     def delete(session, id):
         uri= f'/blueprint/api/blueprints/{id}'
+        try:
+            r = requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
+            r.raise_for_status()
+            return
+        except requests.exceptions.HTTPError as e:
+            print(e)
+
+
+class Account(metaclass=ABCMeta):
+    """
+    Metaclass for Cloud Accounts.
+    """
+
+    def __init__(self, cloudaccount):
+        self.id = cloudaccount['id']
+        self.name = cloudaccount['name']
+        self.description = cloudaccount['description']
+        self.type = cloudaccount['cloudAccountType']
+        self.enabled_region_ids = cloudaccount['enabledRegionIds']
+        self.organization = cloudaccount['organizationId']
+        self.self_link = cloudaccount['selfLink']
+        self._links= cloudaccount['_links']
+        self.custom_properties = cloudaccount['customProperties']
+
+class CloudAccount(Account):
+    """
+    Class for Cloud Account methods.
+    """
+
+    @classmethod
+    def list(cls, session):
+        uri = '/iaas/cloud-accounts'
+        try:
+            r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
+            r.raise_for_status()
+            j = r.json()
+            data = list()
+            for i in j['content']:
+                data.append(i['id'])
+            return data
+        except requests.exceptions.HTTPError as e:
+            print(e)
+
+    @classmethod
+    def describe(cls, session, id):
+        uri = f'/iaas/cloud-accounts/{id}'
+        try:
+            r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
+            r.raise_for_status()
+            j = r.json()
+            return cls(j)
+        except requests.exceptions.HTTPError as e:
+            print(e)
+
+    @classmethod
+    def remove(cls, session, id):
+        uri = f'/api/cloud-accounts/{id}'
         requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
         return
 
-    @staticmethod
-    def request(session):
-        uri = '/blueprint/api/blueprint-requests/'
-        r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
-        j = r.json()
-        data = list()
-        for i in j['links']:
-            i = os.path.split(i)[1]
-            data.append(i)
-        return data
+    @classmethod
+    def delete(cls, session, id):
+        uri = f'/iaas/cloud-accounts/{id}'
+        requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
+        return
 
-    @staticmethod
-    def request_detail(session, id):
-        #data = list()
-        uri = f'/blueprint/api/blueprint-requests/{id}'
-        r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
-        j = r.json()
-        #data.append(j)
-        return j
 
-    @staticmethod
-    def request_cancel(session, id):
-        uri = f'/blueprint/api/blueprint-requests/{id}?action=cancel'
-        payload = {}
+class CloudAccountAws(Account):
+    """
+    Classes for AWS Cloud Account methods.
+    """
+
+    @classmethod
+    def list(cls, session):
+        uri = '/iaas/cloud-accounts-aws'
         try:
-            requests.post(f'{session.baseurl}{uri}', headers = session.headers, data = payload)
+            r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
+            j = r.json()
+            data = list()
+            for i in j['content']:
+                data.append(i['id'])
+            return data
         except requests.exceptions.HTTPError as e:
             print(e)
-            sys.exit(1)
-        #if r.status_code == 204:
-        #    print('Successfully cancelled request')
-        #else:
-        #    print('Cancellation failed with',r.status_code)
-        return
 
-class CloudAccount(object):
-    """
-    Classes for Cloud Account methods.
-    """
-    def __init__(self):
-        pass
-
-    @staticmethod
-    def list(session):
-        uri = '/iaas/cloud-accounts'
-        r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
-        j = r.json()
-        data = list()
-        for i in j:
-            i = i['selfLink']
-            i = os.path.split(i)[1]
-            data.append(i)
-        return data
-
-    @staticmethod
-    def listaws(session):
-        uri = '/iaas/cloud-accounts-aws'
-        r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
-        j = r.json()
-        data = list()
-        for i in j:
-            i = i['selfLink']
-            i = os.path.split(i)[1]
-            data.append(i)
-        return data
-
-    @staticmethod
-    def listazure(session):
-        uri = '/iaas/cloud-accounts-azure'
-        r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
-        j = r.json()
-        data = list()
-        for i in j:
-            i = i['selfLink']
-            i = os.path.split(i)[1]
-            data.append(i)
-        return data
-
-    @staticmethod
-    def listvsphere(session):
-        uri = '/iaas/cloud-accounts-vsphere'
-        r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
-        j = r.json()
-        data = list()
-        for i in j:
-            i = i['selfLink']
-            i = os.path.split(i)[1]
-            data.append(i)
-        return data
-
-    @staticmethod
-    def delete(session, id):
-        uri = f'/api/cloud-accounts/{id}'
-        r = requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
-        print(r.status_code)
-        return
-
-    @staticmethod
-    def createAWS(session, name, access_key, secret_key, regions = 'us-west-1', create_zone = False, description = ''):
+    @classmethod
+    def create(cls, session, name, access_key, secret_key, regions = 'us-west-1', create_zone = False, description = ''):
         print('Creating AWS Cloud Account',name)
         body = {
             "name": name,
@@ -218,15 +285,30 @@ class CloudAccount(object):
         try:
             r = requests.post(f'{session.baseurl}{uri}', headers = session.headers, data = json.dumps(body))
             j=r.json()
-            print('Cloud Account',name,'created')
-            return j
+            return cls(j)
         except requests.exceptions.HTTPError as e:
             print(e)
-            sys.exit(1)
 
-    @staticmethod
-    def createAzure(session, name, subscription_id, tenant_id, application_id, application_key, regions = 'westus', create_zone = False, description = ''):
-        print('Creating Azure Cloud Account',name)
+    @classmethod
+    def remove(cls, session, id):
+        uri = f'/api/cloud-accounts-aws/{id}'
+        requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
+        return
+
+class CloudAccountAzure(Account):
+
+    @classmethod
+    def list(cls, session):
+        uri = '/iaas/cloud-accounts-azure'
+        r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
+        j = r.json()
+        data = list()
+        for i in j['content']:
+            data.append(i)
+        return data
+
+    @classmethod
+    def create(cls, session, name, subscription_id, tenant_id, application_id, application_key, regions = 'westus', create_zone = False, description = ''):
         body = {
             "name": name,
             "description": description,
@@ -243,10 +325,26 @@ class CloudAccount(object):
             r.raise_for_status()
             j=r.json()
             print('Cloud Account',name,'created')
-            return j
+            return cls(j)
         except requests.exceptions.HTTPError as e:
             print(e)
-            sys.exit(1)
+
+class CloudAccountvSphere(Account):
+
+    @classmethod
+    def list(cls, session):
+        uri = '/iaas/cloud-accounts-vsphere'
+        try:
+            r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
+            r.raise_for_status()
+            j = r.json()
+            data = list()
+            for i in j['content']:
+                data.append(i)
+            return data
+        except requests.exceptions.HTTPError as e:
+            print(e)
+
 
     @staticmethod
     def createvSphere(session, name, fqdn, rdc, username, password, datacenter_moid, nsx_cloud_account='', description = ''):
@@ -343,7 +441,6 @@ class DataCollector(object):
         uri = '/api/data-collector/'
         r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
         j = r.json()
-        print(len(j),'Data Collectors found')
         return j
 
     @staticmethod
@@ -371,7 +468,6 @@ class CloudZone(object):
             return j
         except requests.exceptions.HTTPError as e:
             print(e)
-            sys.exit(1)
 
     @staticmethod
     def create(session, name, region_id, placement_policy = 'DEFAULT', tags = [], tags_to_match = [], description = ''):
@@ -420,7 +516,7 @@ class Deployment(object):
 
     @staticmethod
     def delete(session, id):
-        uri = f'/deployment/api/deployments/{id}'
+        uri = f'/deployment/api/deployments/{id}?forceDelete=true'
         requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
 
 class NetworkProfile(object):
@@ -437,7 +533,6 @@ class NetworkProfile(object):
         if r.status_code != 200:
             print('Unable to list network profiles, status code',r.status_code)
         else:
-            print(len(j),'network profiles found')
             for i in j:
                 data.append(i)
         return data
@@ -451,6 +546,27 @@ class NetworkProfile(object):
             if r.status_code != 200:
                 print('Unable to delete network profile',i['name'],'status code',r.status_code)
         return
+
+    @staticmethod
+    def createaws(session):
+
+        return
+
+    @staticmethod
+    def createazure(session):
+        return
+
+    @staticmethod
+    def createvsphere(session):
+        data = {
+            "name": "Azure Network Profile",
+            "regionLink": "{{azureRegionLink}}",
+            "fabricNetworkLinks" : [
+                "{{azureNetworkLink}}"
+            ]
+            }
+        return data
+
 
 class StorageProfile(object):
     @staticmethod
@@ -476,22 +592,24 @@ class StorageProfile(object):
         uri = '/iaas/storage-profiles-aws'
         try:
             r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
+            r.raise_for_status()
             j = r.json()
+            return j
         except requests.exceptions.HTTPError as e:
             print(e)
-            sys.exit(1)
-        return j
+
+
 
     @staticmethod
     def list_vsphere(session):
         uri = '/iaas/storage-profiles-vsphere'
         try:
             r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
+            r.raise_for_status()
             j = r.json()
+            return j
         except requests.exceptions.HTTPError as e:
             print(e)
-            sys.exit(1)
-        return j
 
     @staticmethod
     def delete(session, profiles):
@@ -501,7 +619,6 @@ class StorageProfile(object):
                 requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
             except requests.exceptions.HTTPError as e:
                 print(e)
-                sys.exit(1)
 
     @staticmethod
     def delete_aws(session, id):
@@ -510,7 +627,6 @@ class StorageProfile(object):
             requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
         except requests.exceptions.HTTPError as e:
             print(e)
-            sys.exit(1)
         return
 
     @staticmethod
@@ -520,7 +636,6 @@ class StorageProfile(object):
             requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
         except requests.exceptions.HTTPError as e:
             print(e)
-            sys.exit(1)
         return
 
     @staticmethod
@@ -553,6 +668,30 @@ class ImageMapping(object):
         if r.status_code != 200:
             print('Unable to delete image profiles status code',r.status_code)
         return
+
+    @staticmethod
+    def create(session, name="Ubuntu", image="Canonical:UbuntuServer:16.04-LTS:latest", region="dev azure / westus", description=None):
+        #uri = '/iaas/image-profiles'
+        uri = f'/iaas/fabric-images?$filter=name eq {image}'
+        data = [{
+            "imageMappings" : {
+                "mapping" : {
+                    f"{name}" : {
+                        "externalRegionId" : f"{region}",
+                        "name" : f"{image}",
+                        "description" : f"{description}",
+                    }
+                }
+            }
+        }]
+        try:
+            #r = requests.post(f'{session.baseurl}{uri}', headers = session.headers, json=data)
+            r = requests.post(f'{session.baseurl}{uri}', headers = session.headers, json = data)
+            r.raise_for_status()
+            j = r.json()
+            return j
+        except requests.exceptions.HTTPError as e:
+            print(e)
 
 
 class FlavorMapping(object):
@@ -691,6 +830,17 @@ class ServiceBroker(object):
             print(e)
             sys.exit(1)
         return data
+
+    @staticmethod
+    def sources_delete(session, id):
+        uri = f'/library/api/admin/sources/{id}'
+        try:
+            r = requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
+            r.raise_for_status()
+            return
+        except requests.exceptions.HTTPError as e:
+            print(e)
+
 
 
 
