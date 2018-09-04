@@ -861,10 +861,17 @@ class StorageProfile(metaclass=ABCMeta):
         self.updated_at = profile['updatedAt']
         self.organization_id = profile['organizationId']
         self._links = profile['_links']
+        try:
+            self.azure_storage_policies = profile['azureStoragePolicies']
+        except KeyError: pass
+        try:
+            self.aws_storage_policies = profile['azureStoragePolicies']
+        except KeyError: pass
+        try:
+            self.vsphere_storage_policies = profile['azureStoragePolicies']
+        except KeyError: pass
 
 class StorageProfileAzure(StorageProfile):
-    def __init__(self, profile):
-        self.azure_storage_policies = profile['azureStoragePolicies']
 
     @staticmethod
     def list(session):
