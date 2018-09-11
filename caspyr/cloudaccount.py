@@ -30,16 +30,7 @@ class Base(metaclass=ABCMeta):
         """
         Returns a list of account ids.
         """
-        try:
-            r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
-            r.raise_for_status()
-            j = r.json()
-            data = list()
-            for i in j['content']:
-                data.append(i['id'])
-            return data
-        except requests.exceptions.HTTPError as e:
-            print(e)
+        return (session._request(uri=f'{session.baseurl}{uri}'))
 
     @classmethod
     @abstractmethod
@@ -47,13 +38,7 @@ class Base(metaclass=ABCMeta):
         """
         Returns the detail of a cloud account.
         """
-        try:
-            r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
-            r.raise_for_status()
-            j = r.json()
-            return j
-        except requests.exceptions.HTTPError as e:
-            print(e)
+        return (session._request(uri=f'{session.baseurl}{uri}'))
 
     @classmethod
     @abstractmethod
@@ -61,12 +46,7 @@ class Base(metaclass=ABCMeta):
         """
         Creates a Cloud Account.
         """
-        try:
-            r = requests.post(f'{session.baseurl}{uri}', headers = session.headers, json = data)
-            j=r.json()
-            return j
-        except requests.exceptions.HTTPError as e:
-            print(e)
+        return session._request(uri=f'{session.baseurl}{uri}', request_method='POST', json=data)
 
     @classmethod
     @abstractmethod
@@ -74,33 +54,22 @@ class Base(metaclass=ABCMeta):
         """
         Removes the cloud account from cloud assembly only, leaves it registered in discovery.
         """
-        try:
-            r = requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
-            r.raise_for_status()
-            return
-        except requests.exceptions.HTTPError as e:
-            print(e)
+        return session._request(uri=f'{session.baseurl}{uri}', request_method='DELETE')
 
-    @classmethod
+    @staticmethod
     @abstractmethod
-    def delete(self, session, uri):
+    def delete(session, uri):
         """
         Removes the cloud account from discovery, and all other services.
         """
-        try:
-            r = requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
-            r.raise_for_status()
-            return
-        except requests.exceptions.HTTPError as e:
-            print(e)
-
+        return session._request(uri=f'{session.baseurl}{uri}', request_method='DELETE')
 
 class CloudAccount(Base):
     """
     Class for Cloud Account methods.
     """
     def __init__(self, cloudaccount):
-        super().__init__()
+        super().__init__(cloudaccount)
 
     @classmethod
     def list(cls, session):
@@ -155,6 +124,7 @@ class CloudAccountAws(Base):
 
     @classmethod
     def create(cls, session, name, access_key, secret_key, regions = 'us-west-1', create_zone = False, description = ''):
+        uri = '/iaas/cloud-accounts-aws'
         body = {
             "name": name,
             "description": description,
@@ -163,9 +133,7 @@ class CloudAccountAws(Base):
             "regionIds": [regions],
             "createDefaultZones": create_zone
         }
-        uri = '/iaas/cloud-accounts-aws'
-        return cls(super().create(session, uri, body))
-
+        return cls(super().create(session, uri=uri, data=body))
 
 class CloudAccountAzure(Base):
 
@@ -174,9 +142,10 @@ class CloudAccountAzure(Base):
         uri = '/iaas/cloud-accounts-azure'
         return super().list(session, uri)
 
-    def describe(self, session, id):
+    @classmethod
+    def describe(cls, session, id):
         uri = f'/iaas/cloudaccounts-azure/{id}'
-        self.describe(session, uri)
+        return cls(super().describe(session, uri))
 
     @classmethod
     def unregister(cls, session, id):
@@ -201,7 +170,7 @@ class CloudAccountAzure(Base):
             "createDefaultZones": create_zone
         }
         uri = '/iaas/cloud-accounts-azure'
-        return cls(super().create(session, uri, body))
+        return cls(super().create(session, uri=uri, data=body))
 
 class CloudAccountvSphere(Base):
 
@@ -227,6 +196,7 @@ class CloudAccountvSphere(Base):
 
     @classmethod
     def create(cls, session, name, fqdn, rdc, username, password, datacenter_moid, nsx_cloud_account='', description = ''):
+        uri = '/iaas/cloud-accounts-azure'
         body = {
             "name": name,
             "description": description,
@@ -239,7 +209,6 @@ class CloudAccountvSphere(Base):
             "regionIds": datacenter_moid,
             "createDefaultZones": False
             }
-        uri = '/iaas/cloud-accounts-azure'
         return cls(super().create(session, uri, body))
 
 class CloudAccountNSXT(Base):
@@ -265,6 +234,7 @@ class CloudAccountNSXT(Base):
 
     @classmethod
     def createNSXT(cls, session, name, fqdn, rdc, username, password, description = ''):
+        uri = '/iaas/cloud-accounts-nsxt'
         body = {
             "name": name,
             "description": description,
@@ -275,5 +245,4 @@ class CloudAccountNSXT(Base):
             "password": password,
             "createDefaultZones": False
             }
-        uri = '/iaas/cloud-accounts-nsxt'
         return cls(super().create(session, uri, body))
