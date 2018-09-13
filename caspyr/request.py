@@ -41,7 +41,7 @@ class Request(object):
     @classmethod
     def create(cls, session, name='myapp',reason='', description='', id='9862304f0af67875574edc3216c62', project='25a33c8a-eab8-4a43-88fa-45330e0e68d6'):
         uri = f'/blueprint/api/blueprint-requests'
-        body = {
+        payload = {
             "deploymentName": name,
             "reason": reason,
             "description": description,
@@ -53,7 +53,7 @@ class Request(object):
                 "name": name
             }
         }
-        return cls(session._request(f'{session.baseurl}{uri}', method='POST', json=body))
+        return cls(session._request(f'{session.baseurl}{uri}', request_method='POST', payload=payload))
 
     @classmethod
     def list(cls, session):
