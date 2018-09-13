@@ -8,10 +8,8 @@ class Request(object):
         self.request_tracker_link = request['requestTrackerLink']
         self.deployment_name = request['deploymentName']
         self.reason = request['reason']
-        self.description = request['description']
         self.plan = request['plan']
         self.destroy = request['destroy']
-        self.blueprint_id = request['blueprintId']
         self.inputs = request['inputs']
         self.status = request['status']
         self.project_id = request['projectId']
@@ -24,6 +22,12 @@ class Request(object):
         self.updated_at = request['updatedAt']
         self.updated_by = request['updatedBy']
         self.tenants = request['tenants']
+        try:
+            self.blueprint_id = request['blueprintId']
+        except KeyError: pass
+        try:
+            self.description = request['description']
+        except KeyError: pass
         try:
             self.deployment_id = request['deploymentId']
         except KeyError: pass
@@ -49,32 +53,33 @@ class Request(object):
                 "name": name
             }
         }
-        try:
-            r = requests.post(f'{session.baseurl}{uri}', headers = session.headers, json = body)
-            r.raise_for_status()
-            j = r.json()
-            return cls(j)
-        except requests.exceptions.HTTPError as e:
-            print(e)
+        return cls(session._request(f'{session.baseurl}{uri}', method='POST', json=body))
 
-    @staticmethod
-    def list(session):
+    @classmethod
+    def list(cls, session):
         uri = f'/blueprint/api/blueprint-requests'
-        try:
-            r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
-            r.raise_for_status()
-            j = r.json()
-            return j
-        except requests.exceptions.HTTPError as e:
-            print(e)
+        j = session._request(f'{session.baseurl}{uri}')
+        data = list()
+        for i in j['links']:
+            i = os.path.split(i)[1]
+        return data
 
     @classmethod
     def describe(cls, session, id):
         uri = f'/blueprint/api/blueprint-requests/{id}'
-        try:
-            r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
-            r.raise_for_status()
-            j = r.json()
-            return cls(j)
-        except requests.exceptions.HTTPError as e:
-            print(e)
+        return cls(session._request(f'{session.baseurl}{uri}'))
+
+    @staticmethod
+    def cancel(session, id):
+        uri = f'/blueprint/api/blueprint-requests/{id}?action=cancel'
+        return session._request(f'{session.baseurl}{uri}')
+
+    @classmethod
+    def list_incomplete(cls, session):
+        r = cls.list(session)
+        data = list()
+        for i in r:
+            d = cls.describe(session, i)
+            if d.status == 'STARTED':
+                data.append(d.id)
+        return data
