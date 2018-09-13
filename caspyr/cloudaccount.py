@@ -30,7 +30,7 @@ class Base(metaclass=ABCMeta):
         """
         Returns a list of account ids.
         """
-        return (session._request(uri=f'{session.baseurl}{uri}'))
+        return (session._request(url=f'{session.baseurl}{uri}'))
 
     @classmethod
     @abstractmethod
@@ -38,15 +38,15 @@ class Base(metaclass=ABCMeta):
         """
         Returns the detail of a cloud account.
         """
-        return (session._request(uri=f'{session.baseurl}{uri}'))
+        return (session._request(url=f'{session.baseurl}{uri}'))
 
     @classmethod
     @abstractmethod
-    def create(cls, session, uri ,data):
+    def create(cls, session, uri, payload):
         """
         Creates a Cloud Account.
         """
-        return session._request(uri=f'{session.baseurl}{uri}', request_method='POST', json=data)
+        return session._request(url=f'{session.baseurl}{uri}', request_method='POST', payload=payload)
 
     @classmethod
     @abstractmethod
@@ -54,7 +54,7 @@ class Base(metaclass=ABCMeta):
         """
         Removes the cloud account from cloud assembly only, leaves it registered in discovery.
         """
-        return session._request(uri=f'{session.baseurl}{uri}', request_method='DELETE')
+        return session._request(url=f'{session.baseurl}{uri}', request_method='DELETE')
 
     @staticmethod
     @abstractmethod
@@ -62,7 +62,7 @@ class Base(metaclass=ABCMeta):
         """
         Removes the cloud account from discovery, and all other services.
         """
-        return session._request(uri=f'{session.baseurl}{uri}', request_method='DELETE')
+        return session._request(url=f'{session.baseurl}{uri}', request_method='DELETE')
 
 class CloudAccount(Base):
     """
@@ -125,7 +125,7 @@ class CloudAccountAws(Base):
     @classmethod
     def create(cls, session, name, access_key, secret_key, regions = 'us-west-1', create_zone = False, description = ''):
         uri = '/iaas/cloud-accounts-aws'
-        body = {
+        payload = {
             "name": name,
             "description": description,
             "accessKeyId": access_key,
@@ -133,7 +133,7 @@ class CloudAccountAws(Base):
             "regionIds": [regions],
             "createDefaultZones": create_zone
         }
-        return cls(super().create(session, uri=uri, data=body))
+        return cls(super().create(session, uri=uri, payload=payload))
 
 class CloudAccountAzure(Base):
 
@@ -159,7 +159,7 @@ class CloudAccountAzure(Base):
 
     @classmethod
     def create(cls, session, name, subscription_id, tenant_id, application_id, application_key, regions = 'westus', create_zone = False, description = ''):
-        body = {
+        payload = {
             "name": name,
             "description": description,
             "subscriptionId": subscription_id,
@@ -170,7 +170,7 @@ class CloudAccountAzure(Base):
             "createDefaultZones": create_zone
         }
         uri = '/iaas/cloud-accounts-azure'
-        return cls(super().create(session, uri=uri, data=body))
+        return cls(super().create(session, uri=uri, payload=payload))
 
 class CloudAccountvSphere(Base):
 
@@ -197,7 +197,7 @@ class CloudAccountvSphere(Base):
     @classmethod
     def create(cls, session, name, fqdn, rdc, username, password, datacenter_moid, nsx_cloud_account='', description = ''):
         uri = '/iaas/cloud-accounts-azure'
-        body = {
+        payload = {
             "name": name,
             "description": description,
             "hostName": fqdn,
@@ -209,7 +209,7 @@ class CloudAccountvSphere(Base):
             "regionIds": datacenter_moid,
             "createDefaultZones": False
             }
-        return cls(super().create(session, uri, body))
+        return cls(super().create(session, uri=uri, payload=payload))
 
 class CloudAccountNSXT(Base):
 
@@ -235,7 +235,7 @@ class CloudAccountNSXT(Base):
     @classmethod
     def createNSXT(cls, session, name, fqdn, rdc, username, password, description = ''):
         uri = '/iaas/cloud-accounts-nsxt'
-        body = {
+        payload = {
             "name": name,
             "description": description,
             "hostName": fqdn,
@@ -245,4 +245,4 @@ class CloudAccountNSXT(Base):
             "password": password,
             "createDefaultZones": False
             }
-        return cls(super().create(session, uri, body))
+        return cls(super().create(session, uri=uri, payload=payload))

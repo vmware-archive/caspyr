@@ -29,7 +29,7 @@ class Session(object):
                 print(e)
                 sys.exit(1)
 
-    def _request(self, uri, request_method='GET', data=None, **kwargs):
+    def _request(self, url, request_method='GET', payload=None, **kwargs):
         """
         Credits: Russell Pope
         Generic requestor method for all of the HTTP methods. This gets invoked by pretty much everything in the API.
@@ -43,14 +43,14 @@ class Session(object):
 
         """
 
-        if request_method == "PUT" or "POST" or "PATCH" and data:
-            if type(data) == dict:
-                data = json.dumps(json)
+        if request_method == "PUT" or "POST" or "PATCH" and payload:
+            if type(payload) == dict:
+                payload = json.dumps(payload)
 
             r = requests.request(request_method,
-                                 url=uri,
+                                 url=url,
                                  headers=self.headers,
-                                 json=data)
+                                 data=payload)
 
             if not r.ok:
                 raise requests.exceptions.HTTPError('HTTP error. Status code was:', r.status_code, r.content)
@@ -59,18 +59,18 @@ class Session(object):
 
         elif request_method == "GET":
             r = requests.request(request_method,
-                                 url=uri,
+                                 url=url,
                                  headers=self.headers)
 
             if not r.ok:
-                uri_code = f'Target uri: {r.uri}, Status Code: {r.status_code}'
+                uri_code = f'Target uri: {r.url}, Status Code: {r.status_code}'
                 raise requests.exceptions.HTTPError('HTTP error. Status and content:',uri_code , r.content)
 
             return r.json()
 
         elif request_method == "DELETE":
             r = requests.request(request_method,
-                                 url=uri,
+                                 url=url,
                                  headers=self.headers)
 
             if not r.ok:
