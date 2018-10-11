@@ -73,8 +73,19 @@ class CloudAccount(Base):
 
     @classmethod
     def list(cls, session):
+        """
+        For whatever reason, the initial call only returns a list of hrefs, and no human readable info.
+        We use those links to return a subset human readable data, which is slower but useful.
+        """
         uri = '/iaas/cloud-accounts'
-        return super().list(session, uri)
+        j = super().list(session, uri)
+        data = list()
+        for i in j['content']:
+            c = cls.describe(session, i['id'])
+            data.append({c.name, c.id})
+        data = dict(data)
+        data = json.dumps(data, indent=2)
+        return data
 
     @classmethod
     def describe(cls, session, id):
@@ -101,16 +112,21 @@ class CloudAccountAws(Base):
     Class for AWS Cloud Account methods.
     """
     def __init__(self, cloudaccount):
-        super().__init__()
+        super().__init__(cloudaccount)
 
     @classmethod
     def list(cls, session):
         uri = '/iaas/cloud-accounts-aws'
-        return super().list(session, uri)
+        j = super().list(session, uri)
+        print(j['content'])
+        for i in j['content']:
+            return cls.describe(session, i['id'])
 
-    def describe(self, session, id):
+
+    @classmethod
+    def describe(cls, session, id):
         uri = f'/iaas/cloudaccounts-aws/{id}'
-        self.describe(session, uri)
+        cls.describe(session, uri)
 
     @classmethod
     def unregister(cls, session, id):
