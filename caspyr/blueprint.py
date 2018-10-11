@@ -90,35 +90,34 @@ class Blueprint(object):
             print(e)
 
     @staticmethod
+    def list_provider_resources(session):
+        uri = '/blueprint/api/provider-resources'
+        try:
+            r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
+            r.raise_for_status()
+            j = r.json()
+            return j
+        except requests.exceptions.HTTPError as e:
+            print(e)
+
+    @staticmethod
+    def describe_provider_resources(session, id):
+        uri = f'/blueprint/api/provider-resources/{id}'
+        try:
+            r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
+            r.raise_for_status()
+            j = r.json()
+            return j
+        except requests.exceptions.HTTPError as e:
+            print(e)
+
+
+    @staticmethod
     def delete(session, id):
         uri= f'/blueprint/api/blueprints/{id}'
         try:
             r = requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
             r.raise_for_status()
             return
-        except requests.exceptions.HTTPError as e:
-            print(e)
-
-    @classmethod
-    def request(cls, session, name='myapp',reason='', description='', id='9862304f0af67875574edc3216c62', project='25a33c8a-eab8-4a43-88fa-45330e0e68d6'):
-        uri= f'/blueprint/api/blueprints-requests/'
-        body = {
-            "deploymentName": name,
-            "reason": reason,
-            "description": description,
-            "projectLink": project,
-            "plan": 'false',
-            "destroy": 'false',
-            "blueprintId": id,
-            "inputs": {
-                "name": name
-            }
-        }
-        try:
-            r = requests.post(f'{session.baseurl}{uri}', headers = session.headers, json=body)
-            r.raise_for_status()
-            j = r.json
-            print(j)
-            return j
         except requests.exceptions.HTTPError as e:
             print(e)
