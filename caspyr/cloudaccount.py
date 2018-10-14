@@ -14,7 +14,6 @@ class Base(metaclass=ABCMeta):
         self.name = cloudaccount['name']
         self.enabled_region_ids = cloudaccount['enabledRegionIds']
         self.organization = cloudaccount['organizationId']
-        self.self_link = cloudaccount['selfLink']
         self._links= cloudaccount['_links']
         self.custom_properties = cloudaccount['customProperties']
         try:
@@ -79,12 +78,13 @@ class CloudAccount(Base):
         """
         uri = '/iaas/cloud-accounts'
         j = super().list(session, uri)
-        data = list()
+        data = []
         for i in j['content']:
-            c = cls.describe(session, i['id'])
-            data.append({c.name, c.id})
-        data = dict(data)
-        data = json.dumps(data, indent=2)
+            c = cls.describe(session, i['id'])            
+            content = {}
+            content['name'] = c.name
+            content['id'] = c.id
+            data.append(content)
         return data
 
     @classmethod
