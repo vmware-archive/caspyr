@@ -7,6 +7,4 @@ from .deployment import Deployment
 from .project import Project
 from .mapping import FlavorMapping, ImageMapping, StorageProfileAWS, StorageProfileAzure, StorageProfilevSphere, NetworkFabric, NetworkProfile, Network
 from .zone import CloudZone
-from .codestream import CodeStream
-from .vmcs import DataCollector
-from .vmcs import Org, ServiceBroker, NetworkFabric, ProvisioningRegion
+from .codestream import CodeStream  
