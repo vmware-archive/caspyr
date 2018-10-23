@@ -77,15 +77,7 @@ class CloudAccount(Base):
         We use those links to return a subset human readable data, which is slower but useful.
         """
         uri = '/iaas/cloud-accounts'
-        j = super().list(session, uri)
-        data = []
-        for i in j['content']:
-            c = cls.describe(session, i['id'])            
-            content = {}
-            content['name'] = c.name
-            content['id'] = c.id
-            data.append(content)
-        return data
+        return super().list(session, uri)
 
     @classmethod
     def describe(cls, session, id):
@@ -94,12 +86,12 @@ class CloudAccount(Base):
 
     @classmethod
     def unregister(cls, session, id):
-        uri = f'/api/cloud-accounts/{id}'
+        uri = f'/iaas/cloud-accounts/{id}'
         return super().unregister(session, uri)
 
     @classmethod
     def delete(cls, session, id):
-        uri = f'/iaas/cloud-accounts/{id}'
+        uri = f'/api/cloud-accounts/{id}'
         return super().delete(session, uri)
 
     @classmethod
@@ -117,25 +109,21 @@ class CloudAccountAws(Base):
     @classmethod
     def list(cls, session):
         uri = '/iaas/cloud-accounts-aws'
-        j = super().list(session, uri)
-        print(j['content'])
-        for i in j['content']:
-            return cls.describe(session, i['id'])
-
+        return super().list(session, uri)['content']
 
     @classmethod
     def describe(cls, session, id):
-        uri = f'/iaas/cloudaccounts-aws/{id}'
-        cls.describe(session, uri)
+        uri = f'/iaas/cloud-accounts-aws/{id}'
+        return cls(super().describe(session, uri))
 
     @classmethod
     def unregister(cls, session, id):
-        uri = f'/api/cloud-accounts-aws/{id}'
+        uri = f'/iaas/cloud-accounts-aws/{id}'
         return super().unregister(session, uri)
 
     @classmethod
     def delete(cls, session, id):
-        uri = f'/iaas/cloud-accounts-aws/{id}'
+        uri = f'/api/cloud-accounts/{id}'
         return super().delete(session, uri)
 
     @classmethod
@@ -156,21 +144,21 @@ class CloudAccountAzure(Base):
     @classmethod
     def list(cls, session):
         uri = '/iaas/cloud-accounts-azure'
-        return super().list(session, uri)
+        return super().list(session, uri)['content']
 
     @classmethod
     def describe(cls, session, id):
-        uri = f'/iaas/cloudaccounts-azure/{id}'
+        uri = f'/iaas/cloud-accounts-azure/{id}'
         return cls(super().describe(session, uri))
 
     @classmethod
     def unregister(cls, session, id):
-        uri = f'/api/cloud-accounts-azure/{id}'
+        uri = f'/iaas/cloud-accounts-azure/{id}'
         return super().unregister(session, uri)
 
     @classmethod
     def delete(cls, session, id):
-        uri = f'/iaas/cloud-accounts-azure/{id}'
+        uri = f'/api/cloud-accounts/{id}'
         return super().delete(session, uri)
 
     @classmethod
@@ -193,21 +181,21 @@ class CloudAccountvSphere(Base):
     @classmethod
     def list(cls, session):
         uri = '/iaas/cloud-accounts-vsphere'
-        return super().list(session, uri)
+        return super().list(session, uri)['content']
 
     @classmethod
     def describe(cls, session, id):
-        uri = f'/iaas/cloudaccounts-vsphere/{id}'
+        uri = f'/iaas/cloud-accounts-vsphere/{id}'
         return super().describe(session, uri)
 
     @classmethod
     def unregister(cls, session, id):
-        uri = f'/api/cloud-accounts-vsphere/{id}'
+        uri = f'/iaas/cloud-accounts-vsphere/{id}'
         return super().unregister(session, uri)
 
     @classmethod
     def delete(cls, session, id):
-        uri = f'/iaas/cloud-accounts-vsphere/{id}'
+        uri = f'/api/cloud-accounts/{id}'
         return super().delete(session, uri)
 
     @classmethod
@@ -232,20 +220,20 @@ class CloudAccountNSXT(Base):
     @classmethod
     def list(cls, session):
         uri = '/iaas/cloud-accounts-nsxt'
-        return super().list(session, uri)
+        return super().list(session, uri)['content']
 
     def describe(self, session, id):
-        uri = f'/iaas/cloudaccounts-nsxt/{id}'
+        uri = f'/iaas/cloud-accounts-nsxt/{id}'
         self.describe(session, uri)
 
     @classmethod
     def unregister(cls, session, id):
-        uri = f'/api/cloud-accounts-nsxt/{id}'
+        uri = f'/iaas/cloud-accounts-nsxt/{id}'
         return super().unregister(session, uri)
 
     @classmethod
     def delete(cls, session, id):
-        uri = f'/iaas/cloud-accounts-nsxt/{id}'
+        uri = f'/api/cloud-accounts/{id}'
         return super().delete(session, uri)
 
     @classmethod
