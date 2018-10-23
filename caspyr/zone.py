@@ -8,12 +8,15 @@ class CloudZone(object):
     Classes for Cloud Zone methods.
     """
     def __init__(self, zone):
-        self.tags = zone['tags']
-        self.tags_to_match = zone['tagsToMatch']
+        try:
+            self.tags = zone['tags']
+        except KeyError: pass
+        try:
+            self.tags_to_match = zone['tagsToMatch']
+        except KeyError: pass
         self.placement_policy = zone['placementPolicy']
         self.name = zone['name']
         self.id = zone['id']
-        self.self_link = zone['selfLink']
         self.updated_at = zone['updatedAt']
         self._links = zone['_links']
 
@@ -33,7 +36,7 @@ class CloudZone(object):
     @classmethod
     def create(cls, session, name, region_id, placement_policy = 'DEFAULT', tags = [], tags_to_match = [], description = ''):
         uri = '/iaas/zones/'
-        body = {
+        payload = {
             "name": name,
             "description": description,
             "regionId": region_id,
@@ -41,7 +44,7 @@ class CloudZone(object):
             "tags": tags,
             "tagsToMatch": tags_to_match
         }
-        return cls(session._request(f'{session.baseurl}{uri}', request_method='POST', json=body))
+        return cls(session._request(url=f'{session.baseurl}{uri}', request_method='POST', payload=payload))
 
     @staticmethod
     def delete(session, id):
