@@ -26,3 +26,9 @@ class Region(object):
         uri = f'/iaas/regions/{id}'
         j = session._request(f'{session.baseurl}{uri}')
         return cls(j)
+
+    @classmethod
+    def describe_by_name(cls, session, name):
+        uri = f'/iaas/regions/?$filter=externalRegionId eq {name}'
+        j = session._request(f'{session.baseurl}{uri}')
+        return j
