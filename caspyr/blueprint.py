@@ -36,28 +36,16 @@ class Blueprint(object):
     def list(session):
         uri = '/blueprint/api/blueprints/'
         data = list()
-        try:
-            r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
-            r.raise_for_status()
-            j = r.json()
-            data = list()
-            for i in j['links']:
-                i = os.path.split(i)[1]
-                data.append(i)
-            return data
-        except requests.exceptions.HTTPError as e:
-            print(e)
+        j = session._request(f'{session.baseurl}{uri}')
+        for i in j['links']:
+            i = os.path.split(i)[1]
+            data.append(i)
+        return data
 
     @classmethod
     def describe(cls, session, bp):
         uri= f'/blueprint/api/blueprints/{bp}'
-        try:
-            r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
-            r.raise_for_status()
-            j = r.json()
-            return cls(j)
-        except requests.exceptions.HTTPError as e:
-            print(e)
+        return cls(session._request(f'{session.baseurl}{uri}'))
 
     @classmethod
     def create_from_JSON(cls, session, jsonfile):
