@@ -50,15 +50,9 @@ class Project(object):
     @classmethod
     def removezones(cls, session, id):
         uri = f'/iaas/projects/{id}'
-        data = {}
-        data['zoneAssignmentConfigurations'] = []
-        try:
-            r = requests.patch(f'{session.baseurl}{uri}', headers = session.headers, json = data)
-            r.raise_for_status()
-            j = r.json()
-            return cls(j)
-        except requests.exceptions.HTTPError as e:
-            print(e)
+        payload = {}
+        payload['zoneAssignmentConfigurations'] = []
+        return cls(session._request(f'{session.baseurl}{uri}', request_method='PATCH', payload=payload))
 
 
 
