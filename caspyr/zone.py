@@ -19,6 +19,7 @@ class CloudZone(object):
         self.id = zone['id']
         self.updated_at = zone['updatedAt']
         self._links = zone['_links']
+        self.region_id = os.path.split(self._links['region']['href'])[1]
 
 
     @staticmethod
@@ -32,6 +33,11 @@ class CloudZone(object):
     def describe(cls, session, id):
         uri = f'/iaas/zones/{id}'
         return cls(session._request(f'{session.baseurl}{uri}'))
+
+    @classmethod
+    def describe_by_name(cls, session, name):
+        uri = f'/iaas/zones?$filter=(name eq \'{name}\')'
+        return cls(session._request(f'{session.baseurl}{uri}')['content'][0])
 
     @classmethod
     def create(cls, session, name, region_id, placement_policy = 'DEFAULT', tags = [], tags_to_match = [], description = ''):
