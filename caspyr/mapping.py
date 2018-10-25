@@ -45,7 +45,7 @@ class StorageProfileAzure(StorageProfile):
     @staticmethod
     def delete(session, id):
         uri = f'/iaas/storage-profiles-azure/{id}'
-        return session._request(f'{session.baseurl}{uri}', method='DELETE')
+        return session._request(f'{session.baseurl}{uri}', request_method='DELETE')
 
 class StorageProfileAWS(StorageProfile):
     def __init__(self, storageprofile):
@@ -60,7 +60,7 @@ class StorageProfileAWS(StorageProfile):
     @staticmethod
     def delete(session, id):
         uri = '/iaas/storage-profiles-aws/{id}'
-        return session._request(f'{session.baseurl}{uri}', method='DELETE')
+        return session._request(f'{session.baseurl}{uri}', request_method='DELETE')
 
 class StorageProfilevSphere(StorageProfile):
     def __init__(self, storageprofile):
@@ -75,37 +75,51 @@ class StorageProfilevSphere(StorageProfile):
     @staticmethod
     def delete(session, id):
         uri = f'/iaas/storage-profiles-vsphere/{id}'
-        return session._request(f'{session.baseurl}{uri}', method='DELETE')
-
+        return session._request(f'{session.baseurl}{uri}', request_method='DELETE')
 
 class ImageMapping(object):
+    def __init__(self, mapping):
+        self.id=mapping['id']
+        self.name=mapping['name']
+        self.description=mapping['description']
+        self.updated_at=mapping['updatedAt']
+        self.organization_id=mapping['organizationId']
+        self.external_region_id=mapping['externalRegionId']
+        self._links=mapping['_links']
+        self.image_mappings=mapping['imageMappings']
+
     @staticmethod
     def list(session):
         uri = '/iaas/image-profiles'
         j = session._request(f'{session.baseurl}{uri}')
         return j['content']
 
-    @staticmethod
-    def delete(session, i):
-        uri = f'/iaas/image-profiles/{i}'
-        return session._request(f'{session.baseurl}{uri}', method='DELETE')
+    def describe(self, session, id):
+        uri = f'/iaas/image-profiles/{id}'
+        return session._request(f'{session.baseurl}{uri}')['content']
 
     @staticmethod
-    def create(session, name="Ubuntu", image="Canonical:UbuntuServer:16.04-LTS:latest", region="dev azure / westus", description=None):
-        #uri = '/iaas/image-profiles'
-        uri = f'/iaas/fabric-images?$filter=name eq {image}'
-        data = [{
-            "imageMappings" : {
-                "mapping" : {
-                    f"{name}" : {
-                        "externalRegionId" : f"{region}",
-                        "name" : f"{image}",
-                        "description" : f"{description}",
-                    }
+    def delete(session, id):
+        uri = f'/iaas/image-profiles/{id}'
+        return session._request(f'{session.baseurl}{uri}', request_method='DELETE')
+
+    @classmethod
+    def create(cls, session, name, image_name, image_id, region_id, description=None):
+        uri = '/iaas/image-profiles'
+        payload = {
+            "name": f"{name}",
+            "description": f"{description}",
+            "regionId": f"{region_id}",
+            "imageMapping": {
+                f"{name}": {
+                    "id": f"{image_id}",
+                    "name": f"{image_name}"
                 }
             }
-        }]
-        return session._request(f'{session.baseurl}{uri}', method='POST', json=data)
+        }
+        return (session._request(f'{session.baseurl}{uri}', request_method='POST', payload=payload))
+
+
 
 
 class FlavorMapping(object):
@@ -118,7 +132,7 @@ class FlavorMapping(object):
     @staticmethod
     def delete(session, id):
         uri = f'/iaas/flavor-profiles/{id}'
-        return session._request(f'{session.baseurl}{uri}', method='DELETE')
+        return session._request(f'{session.baseurl}{uri}', request_method='DELETE')
 
 class NetworkFabric(object):
     """
@@ -210,7 +224,7 @@ class NetworkProfile(object):
         """
         This method requires you to peel the onion a bit.
         It is worth noting that network profiles are scoped to a given region.
-        To get the region info you need, First off, determine the Cloud Account that has the networks you want to add to your network profile.
+        To get the region info you need, first off determine the Cloud Account that has the networks you want to add to your network profile.
         Perform a CloudAccount.describe(session, id) against that account, and return the cls.enabled_region_ids.
         Use the enabled_region_id value for the region you want to configure networks for.
         :param session: type: object. Generated from Session.login(token).
