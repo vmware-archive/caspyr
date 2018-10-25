@@ -7,30 +7,41 @@ class Deployment(object):
     """
     Classes for Cloud Zone methods.
     """
+    def __init__(self,deployment):
+        self.id = deployment['id']
+        self.name = deployment['name']
+        self.description = deployment['description']
+        self.template_link = deployment['templateLink']
+        self.icon_link = deployment['iconLink']
+        self.created_at = deployment['createdAt']
+        self.created_by = deployment['createdBy']
+        self.updated_at = deployment['updatedAt']
+        self.updated_by = deployment['updatedBy']
+        self.inputs = deployment['inputs']
+        self.resource_links = deployment['resourceLinks']
 
     @staticmethod
     def list(session):
         uri = '/deployment/api/deployments'
-        r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
-        j = r.json()
-        data = list()
+        j = session._request(url=f'{session.baseurl}{uri}')
+        data = []
         for i in j['results']:
-            data.append(i['id'  ])
+            data.append(i['id'])
         return data
 
     @staticmethod
     def delete(session, id):
         uri = f'/deployment/api/deployments/{id}?forceDelete=true'
-        requests.delete(f'{session.baseurl}{uri}', headers = session.headers)
+        session._request(request_method='DELETE', url=f'{session.baseurl}{uri}')
 
-    @staticmethod
-    def describe(session, id):
+    @classmethod
+    def describe(cls, session, id):
         uri = f'/deployment/api/deployments/{id}'
         try:
             r = requests.get(f'{session.baseurl}{uri}', headers = session.headers)
             r.raise_for_status()
             j = r.json()
-            return j
+            return cls(j)
         except requests.exceptions.HTTPError as e:
             print(e)
 
