@@ -23,11 +23,7 @@ class Deployment(object):
     @staticmethod
     def list(session):
         uri = '/deployment/api/deployments'
-        j = session._request(url=f'{session.baseurl}{uri}')
-        data = []
-        for i in j['results']:
-            data.append(i['id'])
-        return data
+        return session._request(url=f'{session.baseurl}{uri}')['results']
 
     @staticmethod
     def delete(session, id):
