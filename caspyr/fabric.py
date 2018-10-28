@@ -1,3 +1,8 @@
+"""
+The Fabric module contains all the classes and methods required to get the underlying information
+for creating Image Mappings, Flavor Mappings, Network Profiles and Storage Profiles.
+"""
+
 import requests
 import json
 import os
@@ -20,6 +25,110 @@ class Image(object):
 
     @classmethod
     def describe(cls, session, image, region):
+        """
+        Used to create an instance of the image class. Image details are unique by 'region', so the region must be provided.
+        :param session: An instance of the Session class.
+        :type session: Session
+        :param image: The name of the image you want to describe.
+        :type image: string
+        :param region: The external region id value (friendly name of the region - eg. westus or us-west-1).
+        :return: Returns an instance of the image claass.
+        :rtype: Image
+        """
+
         uri = f'/iaas/fabric-images?$filter=(name eq {image}) and (externalRegionId eq {region})'
         j = session._request(f'{session.baseurl}{uri}')['content'][0]
         return cls(j)
+
+class AzureStorageAccount(object):
+    """
+    The StorageAccountAzure class is a representation of the fabric-azure-storage-account API.
+    It is only used when creating a storage profile for azure unmanaged disks (see Mapping module).
+    """
+
+    def __init(self, account):
+        self.type = account["type"]
+        self.external_region_id = account["externalRegionId"]
+        self.external_id = account["externalId"]
+        self.name = account["name"]
+        self.id = account["id"]
+        self.created_at = account["createdAt"]
+        self.updated_at = account["updatedAt"]
+        self.organization_id = account["organizationId"]
+        self._links = account["_links"]
+
+    @staticmethod
+    def list(session):
+        """
+        Used to list all of the storage accounts associated with Azure unmanaged disks.
+        :param session: An instance of the Session class.
+        :type session: Session
+        :return: Returns a list of storage accounts.
+        """
+        uri = f'/iaas/fabric-azure-storage-account'
+        return session._request(f'{session.baseurl}{uri}')['content']
+
+    @classmethod
+    def describe_by_name(cls, session, name):
+        """
+        Used to create an instance of the StorageAccountAzure class, after finding it by name.
+        :param session: An instance of the Session class.
+        :type session: Session
+        :param name: The name of the unmanaged disk.
+        :type name: string
+        :return: Returns an instance of the StorageAccountAzure class.
+        :rtype: StorageAccountAzure
+        """
+        j = cls.list(session)
+        for i in j:
+            if i['name'] == name:
+                return cls(i)
+
+class Network(object):
+    def __init__(self, network):
+        pass
+
+    @staticmethod
+    def list(session):
+        """
+        :param session: An instance of the Session class.
+        :type session: Session
+        :return: [description]
+        :rtype: [type]
+        """
+        uri = f'/iaas/fabric-network'
+        return session._request(f'{session.baseurl}{uri}')['content']
+
+    @classmethod
+    def describe(cls, session, id):
+        uri = f'/iaas/fabric-network/{id}'
+        return cls(session._request(f'{session.baseurl}{uri}'))
+
+    @classmethod
+    def update(cls, session, id):
+        """[summary]
+
+        :param session: [description]
+        :type session: [type]
+        :param id: [description]
+        :type id: [type]
+        :return: [description]
+        :rtype: [type]
+        """
+
+
+
+        uri = f'/iaas/fabric-network/{id}'
+        payload = {}
+        return cls(session._request(f'{session.baseurl}{uri}', request_method='PATCH', payload=payload))
+
+class AwsVolumeType(object):
+    pass
+
+class vSphereDatastore(object):
+    pass
+
+class vSphereStoragePolicy(object):
+    pass
+
+
