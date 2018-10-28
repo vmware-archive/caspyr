@@ -204,6 +204,19 @@ class Flavor(object):
         return cls(j)
 
 class FlavorMapping(object):
+    def __init__(self, mapping):
+        self.id=mapping['id']
+        self.name=mapping['name']
+        try:
+            self.description=mapping['description']
+        except:
+            KeyError
+        self.updated_at=mapping['updatedAt']
+        self.organization_id=mapping['organizationId']
+        self.external_region_id=mapping['externalRegionId']
+        self._links=mapping['_links']
+        self.image_mappings=mapping['flavorMappings']
+
     @staticmethod
     def list(session):
         uri = '/iaas/flavor-profiles'
@@ -215,7 +228,24 @@ class FlavorMapping(object):
         uri = f'/iaas/flavor-profiles/{id}'
         return session._request(f'{session.baseurl}{uri}', request_method='DELETE')
 
-
+    @classmethod
+    def create(cls, session, name, mapping_name, region_id, flavor_name=None, cpuCount=None, memoryGb=None, memoryMb=None, description=None):
+        uri='/iaas/flavor-profiles/'
+        if memoryGb:
+            memoryMb=memoryGb*1024
+        payload = {
+            "name": name,
+            "description": description,
+            "regionId": region_id,
+            "flavorMapping": {
+                mapping_name: {
+                    "id": flavor_name,
+                    "cpuCount": cpuCount,
+                    "memoryMb": memoryMb
+                }
+            }
+        }
+        return cls(session._request(f'{session.baseurl}{uri}', request_method='POST', payload=payload))
 
 class NetworkFabric(object):
     """
@@ -277,7 +307,7 @@ class NetworkFabric(object):
             print(e)
 
     @classmethod
-    def find_by_name(cls, session):
+    def describe_by_name(cls, session):
         pass
 
 class NetworkProfile(object):
