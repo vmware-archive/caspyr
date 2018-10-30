@@ -1,8 +1,3 @@
-import requests
-import json
-import os
-import sys
-
 class Region(object):
     """
     Class for Region methods.
