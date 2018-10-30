@@ -13,20 +13,18 @@ class Project(object):
         self.members = project['members']
         self.zones = project['zones']
         self.name = project['name']
-        self.description = project['description']
+        try:
+            self.description = project['description']
+        except:
+            KeyError
         self.id = project['id']
-        self.self_link = project['selfLink']
         self.organization_id = project['organizationId']
         self._links = project['_links']
 
     @classmethod
     def list(cls, session):
         uri = '/iaas/projects'
-        data = list()
-        j = session._request(f'{session.baseurl}{uri}')
-        for i in j['content']:
-            data.append(i['id'])
-        return data
+        return session._request(f'{session.baseurl}{uri}')['content']
 
     @classmethod
     def describe(cls, session, id):
@@ -39,7 +37,6 @@ class Project(object):
         for i in j:
             d = cls.describe(session, i)
             if d.name.lower() == name.lower():
-                print(d.name)
                 return d
 
     @staticmethod
@@ -82,18 +79,39 @@ class Project(object):
         except requests.exceptions.HTTPError as e:
             print(e)
 
-    @staticmethod
-    def create(session, name, description):
+    @classmethod
+    def create(cls, session, name, description=None, administrators=None, members=None, zone_configs=None):
+        """
+        Creates a new project with the provided parameters.
+        :param session: [description]
+        :type session: [type]
+        :param name: [description]
+        :type name: [type]
+        :param description: [description], defaults to None
+        :param description: [type], optional
+        :param administrators: [description], defaults to None
+        :param administrators: [type], optional
+        :param members: [description], defaults to None
+        :param members: [type], optional
+        :param zone_configs: Defaults to None.
+        [
+            {
+            "zoneId": "77ee1",
+            "priority": 1,
+            "maxNumberInstances": 50
+            }
+        ]
+        :param zone_configs: List of objects, optional.
+        :return: [description]
+        :rtype: [type]
+        """
+
         uri = '/iaas/projects/'
-        data = {
-                'name' : name,
-                'description' : description,
+        payload = {
+                "name" : name,
+                "description" : description,
+                "administrators" : administrators,
+                "members" : members,
+                "zoneAssignmentConfigurations": zone_configs
                 }
-        print(data)
-        r = requests.post(f'{session.baseurl}{uri}', headers = session.headers, json = data)
-        if r.status_code == 201:
-            content = f'{name} project has been created'
-            return print(content)
-        else:
-            content = f'Error executing: Code {r.status_code}'
-            return print(content)
+        return cls(session._request(f'{session.baseurl}{uri}', request_method='POST', payload=payload))
