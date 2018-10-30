@@ -36,7 +36,7 @@ class Image(object):
         :rtype: Image
         """
 
-        uri = f'/iaas/fabric-images?$filter=(name eq {image}) and (externalRegionId eq {region})'
+        uri = f'/iaas/fabric-images?$filter=(name eq \'{image}\') and (externalRegionId eq {region})'
         j = session._request(f'{session.baseurl}{uri}')['content'][0]
         return cls(j)
 
@@ -84,9 +84,24 @@ class AzureStorageAccount(object):
             if i['name'] == name:
                 return cls(i)
 
-class Network(object):
+class NetworkFabric(object):
     def __init__(self, network):
-        pass
+        self.external_region_id = network['externalRegionId']
+        self.name = network['name']
+        self.id = network['id']
+        self.created_at = network['createdAt']
+        self.updated_at = network['updatedAt']
+        self.organization_id = network['organizationId']
+        self._links = network['_links']
+        try:
+            self.is_public = network['isPublic']
+        except KeyError: pass
+        try:
+            self.is_default = network['isDefault']
+        except KeyError: pass
+        try:
+            self.cidr = network['cidr']
+        except KeyError: pass
 
     @staticmethod
     def list(session):
@@ -96,30 +111,40 @@ class Network(object):
         :return: [description]
         :rtype: [type]
         """
-        uri = f'/iaas/fabric-network'
+        uri = f'/iaas/fabric-networks'
         return session._request(f'{session.baseurl}{uri}')['content']
 
     @classmethod
+    def list_by_region(cls, session, region="*"):
+        uri = f'/iaas/fabric-networks?$filter=externalRegionId eq {region}'
+        return session._request(f'{session.baseurl}{uri}')
+
+    @classmethod
+    def describe_by_name(cls, session, name, region="*"):
+        uri = f'/iaas/fabric-networks?$filter=(name eq {name}) and (externalRegionId eq {region})'
+        return cls(session._request(f'{session.baseurl}{uri}')['content'])
+
+    @classmethod
     def describe(cls, session, id):
-        uri = f'/iaas/fabric-network/{id}'
+        uri = f'/iaas/fabric-networks/{id}'
         return cls(session._request(f'{session.baseurl}{uri}'))
 
     @classmethod
-    def update(cls, session, id):
-        """[summary]
+    def update(cls, session, id, tags):
+        """
 
         :param session: [description]
         :type session: [type]
         :param id: [description]
         :type id: [type]
+        :param tags:
         :return: [description]
         :rtype: [type]
         """
-
-
-
         uri = f'/iaas/fabric-network/{id}'
-        payload = {}
+        payload = {
+            tags
+        }
         return cls(session._request(f'{session.baseurl}{uri}', request_method='PATCH', payload=payload))
 
 class AwsVolumeType(object):
@@ -130,5 +155,3 @@ class vSphereDatastore(object):
 
 class vSphereStoragePolicy(object):
     pass
-
-
