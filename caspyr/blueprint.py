@@ -35,11 +35,11 @@ class Blueprint(object):
     @staticmethod
     def list(session):
         uri = '/blueprint/api/blueprints/'
-        data = list()
+        data = []
         j = session._request(f'{session.baseurl}{uri}')
         for i in j['links']:
             i = os.path.split(i)[1]
-            data.append(i)
+            data.append({ "id" : i })
         return data
 
     @classmethod
@@ -109,3 +109,20 @@ class Blueprint(object):
             return
         except requests.exceptions.HTTPError as e:
             print(e)
+
+    @staticmethod
+    def request(session, id, deployment_name, project_id, blueprint_version=None, reason=None, description=None, deployment_id=None, inputs=None, plan=False, destroy=False):
+        uri = f'/blueprint/api/blueprint-requests'
+        payload = {
+            "deploymentName": deployment_name,
+            "deploymentId": deployment_id,
+            "reason": reason,
+            "description": description,
+            "projectId": project_id,
+            "plan": plan,
+            "destroy": destroy,
+            "blueprintId": id,
+            "blueprintVersion": blueprint_version,
+            "inputs": inputs
+        }
+        return session._request(f'{session.baseurl}{uri}', request_method='POST', payload=payload)
