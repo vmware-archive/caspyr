@@ -29,7 +29,7 @@ class Base(metaclass=ABCMeta):
         """
         Returns a list of account ids.
         """
-        return (session._request(url=f'{session.baseurl}{uri}'))
+        return (session._request(url=f'{session.baseurl}{uri}'))['content']
 
     @classmethod
     @abstractmethod
