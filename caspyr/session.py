@@ -41,11 +41,14 @@ class Session(object):
         :return: The response JSON
 
         """
-        numeric_level = getattr(logging, log_level, None)
+        numeric_level = getattr(logging, log_level.upper(), None)
         if not isinstance(numeric_level, int):
             raise ValueError('Invalid log level: %s' % log_level)
         logging.basicConfig(level=numeric_level)
 
+        if url.startswith('https://console.cloud.vmware.com'):
+            self.headers.update({'csp-auth-token' : self.token.split(" ")[1]})
+        logging.info(f'self.headers = {self.headers}')
         if request_method in ('PUT', 'POST', 'PATCH') and payload:
             if type(payload) == dict:
                 payload = json.dumps(payload)
