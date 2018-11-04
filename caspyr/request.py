@@ -5,21 +5,52 @@ import sys
 
 class Request(object):
     def __init__(self, request):
-        self.id = request['id']
-        self.progress = request['progress']
-        self.message = request['message']
-        self.name = request['name']
+        self.request_tracker_link = request['requestTrackerLink']
+        self.deployment_name = request['deploymentName']
+        self.reason = request['reason']
+        self.plan = request['plan']
+        self.destroy = request['destroy']
+        self.inputs = request['inputs']
         self.status = request['status']
+        self.project_id = request['projectId']
+        self.project_name = request['projectName']
+        self.type = request['type']
+        self.id = request['id']
         self.self_link = request['selfLink']
+        self.created_at = request['createdAt']
+        self.created_by = request['createdBy']
+        self.updated_at = request['updatedAt']
+        self.updated_by = request['updatedBy']
+        self.tenants = request['tenants']
+        try:
+            self.blueprint_id = request['blueprintId']
+        except KeyError: pass
+        try:
+            self.description = request['description']
+        except KeyError: pass
+        try:
+            self.deployment_id = request['deploymentId']
+        except KeyError: pass
+        try:
+            self.failure_message = request['failureMessage']
+        except KeyError: pass
+        try:
+            self.validation_messages = request['validationMessages']
+        except KeyError: pass
 
     @classmethod
     def list(cls, session):
-        uri = f'/iaas/request-tracker/'
-        return session._request(f'{session.baseurl}{uri}')['content']
+        uri = f'/blueprint/api/blueprint-requests/'
+        j = session._request(f'{session.baseurl}{uri}')['links']
+        data = []
+        for i in j:
+            i = os.path.split(i)[1]
+            data.append({ "id" : i })
+        return data
 
     @classmethod
     def describe(cls, session, id):
-        uri = f'/iaas/request-tracker/{id}'
+        uri = f'/blueprint/api/blueprint-requests/{id}'
         return cls(session._request(f'{session.baseurl}{uri}'))
 
     @staticmethod
@@ -33,6 +64,6 @@ class Request(object):
         data = []
         for i in r:
             d = cls.describe(session, i['id'])
-            if d.status != 'FINISHED':
+            if d.status == 'STARTED':
                 data.append({ "id" : d.id })
         return data
