@@ -35,5 +35,5 @@ class Machine(object):
 
     @staticmethod
     def list_orphaned(session):
-        uri = f'iaas/machines?$filter=projectId eq \'*\''
+        uri = f'/iaas/machines?$filter=projectId eq \'*\''
         return session._request(f'{session.baseurl}{uri}')['content']
