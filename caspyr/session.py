@@ -31,7 +31,7 @@ class Session(object):
                 raise e
 
 
-    def _request(self, url, request_method='GET', payload=None, log_level='WARNING', **kwargs):
+    def _request(self, url, request_method='GET', payload=None, log_level='INFO', **kwargs):
         """
         Inspired by the work of Russell Pope.
         :param url: The complete uri for the requested resource. You should include the leading /
@@ -48,7 +48,6 @@ class Session(object):
 
         if url.startswith('https://console.cloud.vmware.com'):
             self.headers.update({'csp-auth-token' : self.token.split(" ")[1]})
-        logging.info(f'self.headers = {self.headers}')
         if request_method in ('PUT', 'POST', 'PATCH') and payload:
             if type(payload) == dict:
                 payload = json.dumps(payload)
@@ -90,7 +89,6 @@ class Session(object):
                                     headers=self.headers)
                 logging.info(f'{request_method} to {url}')
                 logging.info(f'request response code {r.status_code}')
-                logging.info(f'request content {r.json}')
                 r.raise_for_status()
                 return r.status_code
             except requests.exceptions.HTTPError as e:
