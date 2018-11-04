@@ -127,7 +127,7 @@ class CloudAccountAws(Base):
         return super().delete(session, uri)
 
     @classmethod
-    def create(cls, session, name, access_key, secret_key, regions = 'us-west-1', create_zone = False, description = ''):
+    def create(cls, session, name, access_key, secret_key, regions = 'us-west-1', create_zone = False, description = None):
         uri = '/iaas/cloud-accounts-aws'
         payload = {
             "name": name,
@@ -200,7 +200,7 @@ class CloudAccountvSphere(Base):
 
     @classmethod
     def create(cls, session, name, fqdn, rdc, username, password, datacenter_moid, nsx_cloud_account='', description = ''):
-        uri = '/iaas/cloud-accounts-azure'
+        uri = '/iaas/cloud-accounts-vsphere'
         payload = {
             "name": name,
             "description": description,
@@ -219,16 +219,16 @@ class CloudAccountNSXT(Base):
 
     @classmethod
     def list(cls, session):
-        uri = '/iaas/cloud-accounts-nsxt'
+        uri = '/iaas/cloud-accounts-nsx-t'
         return super().list(session, uri)['content']
 
     def describe(self, session, id):
-        uri = f'/iaas/cloud-accounts-nsxt/{id}'
+        uri = f'/iaas/cloud-accounts-nsx-t/{id}'
         self.describe(session, uri)
 
     @classmethod
     def unregister(cls, session, id):
-        uri = f'/iaas/cloud-accounts-nsxt/{id}'
+        uri = f'/iaas/cloud-accounts-nsx-t/{id}'
         return super().unregister(session, uri)
 
     @classmethod
@@ -237,8 +237,8 @@ class CloudAccountNSXT(Base):
         return super().delete(session, uri)
 
     @classmethod
-    def createNSXT(cls, session, name, fqdn, rdc, username, password, description = ''):
-        uri = '/iaas/cloud-accounts-nsxt'
+    def create(cls, session, name, fqdn, rdc, username, password, description = ''):
+        uri = '/iaas/cloud-accounts-nsx-t'
         payload = {
             "name": name,
             "description": description,
