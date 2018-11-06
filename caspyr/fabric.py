@@ -117,7 +117,7 @@ class NetworkFabric(object):
     @classmethod
     def list_by_region(cls, session, region="*"):
         uri = f'/iaas/fabric-networks?$filter=externalRegionId eq {region}'
-        return session._request(f'{session.baseurl}{uri}')
+        return session._request(f'{session.baseurl}{uri}')['content']
 
     @classmethod
     def describe_by_name(cls, session, name, region="*"):
@@ -155,3 +155,12 @@ class vSphereDatastore(object):
 
 class vSphereStoragePolicy(object):
     pass
+
+class Flavor(object):
+    def __init__(self, flavor):
+        pass
+
+    @staticmethod
+    def describe(session): #, name, region):
+        uri = f'/iaas/fabric-flavors' #?$filter=(name eq \'{name}\') and (externalRegionId eq {region})'
+        print(session._request(f'{session.baseurl}{uri}')['content'][0])
