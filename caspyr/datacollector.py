@@ -15,8 +15,9 @@ class DataCollector(object):
         return data
 
     @classmethod
-    def describe(cls):
-        pass
+    def describe(cls, session, id):
+        uri = f'/iaas/data-collectors/{id}'
+        return session._request(f'{session.baseurl}{uri}')
 
     @staticmethod
     def delete(session, id):
