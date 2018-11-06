@@ -199,14 +199,14 @@ class CloudAccountvSphere(Base):
         return super().delete(session, uri)
 
     @classmethod
-    def create(cls, session, name, fqdn, rdc, username, password, datacenter_moid, nsx_cloud_account='', description = ''):
+    def create(cls, session, name, fqdn, rdc, username, password, datacenter_moid, nsx_cloud_account = None, description = None):
         uri = '/iaas/cloud-accounts-vsphere'
         payload = {
             "name": name,
             "description": description,
             "hostName": fqdn,
             "acceptSelfSignedCertificate": True,
-            "linkedCloudAccountLink": nsx_cloud_account,
+            "associatedCloudAccountIds": nsx_cloud_account,
             "dcid": rdc,
             "username": username,
             "password": password,
@@ -222,9 +222,10 @@ class CloudAccountNSXT(Base):
         uri = '/iaas/cloud-accounts-nsx-t'
         return super().list(session, uri)['content']
 
-    def describe(self, session, id):
+    @staticmethod
+    def describe(session, id):
         uri = f'/iaas/cloud-accounts-nsx-t/{id}'
-        self.describe(session, uri)
+        return super().describe(session, uri)
 
     @classmethod
     def unregister(cls, session, id):
@@ -238,7 +239,7 @@ class CloudAccountNSXT(Base):
 
     @classmethod
     def create(cls, session, name, fqdn, rdc, username, password, description = ''):
-        uri = '/iaas/cloud-accounts-nsx-t'
+        uri = '/iaas/cloud-accounts-nsx-t/'
         payload = {
             "name": name,
             "description": description,
@@ -246,7 +247,6 @@ class CloudAccountNSXT(Base):
             "acceptSelfSignedCertificate": True,
             "dcid": rdc,
             "username": username,
-            "password": password,
-            "createDefaultZones": False
+            "password": password
             }
         return cls(super().create(session, uri=uri, payload=payload))
