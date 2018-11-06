@@ -27,6 +27,11 @@ class Deployment(object):
 
     @staticmethod
     def delete(session, id):
+        uri = f'/deployment/api/deployments/{id}'
+        session._request(request_method='DELETE', url=f'{session.baseurl}{uri}')
+
+    @staticmethod
+    def force_delete(session, id):
         uri = f'/deployment/api/deployments/{id}?forceDelete=true'
         session._request(request_method='DELETE', url=f'{session.baseurl}{uri}')
 
