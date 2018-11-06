@@ -185,13 +185,13 @@ class ImageMapping(object):
     def create(cls, session, name, image_name, image_id, region_id, description=None):
         uri = '/iaas/image-profiles'
         payload = {
-            "name": f"{name}",
-            "description": f"{description}",
-            "regionId": f"{region_id}",
+            "name": name,
+            "description": description,
+            "regionId": region_id,
             "imageMapping": {
-                f"{name}": {
-                    "id": f"{image_id}",
-                    "name": f"{image_name}"
+                name: {
+                    "id": image_id,
+                    "name": image_name
                 }
             }
         }
