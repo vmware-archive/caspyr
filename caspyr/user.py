@@ -49,7 +49,7 @@ class User(object):
         return session._request(f'{baseurl}{uri}', request_method='PATCH', payload=payload, log_level=log_level)
 
     @staticmethod
-    def invite(session, id, usernames, org_role='org_member', cloud_assembly=False, code_stream=False, service_broker=False, log_intelligence=False, discovery=False, log_level='WARNING'):
+    def invite(session, id, usernames, org_role='org_member', cloud_assembly=False, code_stream=False, service_broker=False, log_intelligence=False, network_insight=False, log_level='WARNING'):
         baseurl = 'https://console.cloud.vmware.com'
         uri = f'/csp/gateway/am/api/orgs/{id}/invitations'
         payload = {
@@ -80,11 +80,11 @@ class User(object):
                 "serviceDefinitionLink": "/csp/gateway/slc/api/definitions/external/7cJ2ngS_hRCY_bIbWucM4KWQwOo_",
                 "serviceRoleNames": ["log-intelligence:admin","log-intelligence:user"]
             })
-        """
-        if discovery:
+
+        if network_insight:
             payload["serviceRolesDtos"].append({
-                "serviceDefinitionLink": "/csp/gateway/slc/api/definitions/external/SoCD326dY-tGBsLaJf4AHEsnaW0_",
-                "serviceRoleNames": ["discovery:user"]
+                    "serviceDefinitionLink": "/csp/gateway/slc/api/definitions/external/9qjoNafDp9XkyyQLcLCKWPsAir0_",
+                    "serviceRoleNames": ["vrni:admin","vrni:user"]
             })
-        """
+
         return session._request(f'{baseurl}{uri}', request_method='POST', payload=payload, log_level=log_level)
