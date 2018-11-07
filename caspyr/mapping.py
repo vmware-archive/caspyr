@@ -248,7 +248,7 @@ class FlavorMapping(object):
             "regionId": region_id,
             "flavorMapping": {
                 mapping_name: {
-                    "id": flavor_name,
+                    "name": flavor_name,
                     "cpuCount": cpuCount,
                     "memoryMb": memoryMb
                 }
