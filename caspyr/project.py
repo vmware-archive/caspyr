@@ -3,6 +3,7 @@ import json
 import os
 import sys
 
+
 class Project(object):
     """
     Class for Project methods
@@ -15,8 +16,8 @@ class Project(object):
         self.name = project['name']
         try:
             self.description = project['description']
-        except:
-            KeyError
+        except KeyError:
+            pass
         self.id = project['id']
         self.organization_id = project['organizationId']
         self._links = project['_links']
@@ -42,45 +43,54 @@ class Project(object):
     @staticmethod
     def delete(session, id):
         uri = f'/iaas/projects/{id}'
-        return session._request(f'{session.baseurl}{uri}', request_method='DELETE')
+        return session._request(f'{session.baseurl}{uri}',
+                                request_method='DELETE'
+                                )
 
     @classmethod
-    def removezones(cls, session, id):
+    def removezones(cls,
+                    session,
+                    id
+                    ):
         uri = f'/iaas/projects/{id}'
         payload = {}
         payload['zoneAssignmentConfigurations'] = []
-        return cls(session._request(f'{session.baseurl}{uri}', request_method='PATCH', payload=payload))
-
-
+        return cls(session._request(f'{session.baseurl}{uri}',
+                                    request_method='PATCH',
+                                    payload=payload
+                                    ))
 
     @classmethod
-    def removemembers(cls, session, id):
+    def removemembers(cls,
+                      session,
+                      id):
         uri = f'/iaas/projects/{id}'
-        data = {}
-        data['members'] = []
-        try:
-            r = requests.patch(f'{session.baseurl}{uri}', headers = session.headers, json = data)
-            r.raise_for_status()
-            j = r.json()
-            return cls(j)
-        except requests.exceptions.HTTPError as e:
-            print(e)
+        payload = {}
+        payload['members'] = []
+        return cls(session._request(f'{session.baseurl}{uri}',
+                                    request_method='PATCH',
+                                    payload=payload
+                                    ))
 
     @classmethod
     def removeadmins(cls, session, id):
         uri = f'/iaas/projects/{id}'
-        data = {}
-        data['administrators'] = []
-        try:
-            r = requests.patch(f'{session.baseurl}{uri}', headers = session.headers, json = data)
-            r.raise_for_status()
-            j = r.json()
-            return cls(j)
-        except requests.exceptions.HTTPError as e:
-            print(e)
+        payload = {}
+        payload['administrators'] = []
+        return cls(session._request(f'{session.baseurl}{uri}',
+                                    request_method='PATCH',
+                                    payload=payload
+                                    ))
 
     @classmethod
-    def create(cls, session, name, description=None, administrators=None, members=None, zone_configs=None):
+    def create(cls,
+               session,
+               name,
+               description=None,
+               administrators=None,
+               members=None,
+               zone_configs=None
+               ):
         """
         Creates a new project with the provided parameters.
         :param session: [description]
@@ -108,10 +118,13 @@ class Project(object):
 
         uri = '/iaas/projects/'
         payload = {
-                "name" : name,
-                "description" : description,
-                "administrators" : administrators,
-                "members" : members,
+                "name": name,
+                "description": description,
+                "administrators": administrators,
+                "members": members,
                 "zoneAssignmentConfigurations": zone_configs
                 }
-        return cls(session._request(f'{session.baseurl}{uri}', request_method='POST', payload=payload))
+        return cls(session._request(f'{session.baseurl}{uri}',
+                                    request_method='POST',
+                                    payload=payload
+                                    ))

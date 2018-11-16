@@ -16,7 +16,10 @@ class Network(object):
     @staticmethod
     def delete(session, id):
         uri = f'/iaas/networks/{id}'
-        return session._request(f'{session.baseurl}{uri}', request_method='DELETE')
+        return session._request(f'{session.baseurl}{uri}',
+                                request_method='DELETE'
+                                )
+
 
 class Machine(object):
     def __init__(self):
@@ -31,7 +34,18 @@ class Machine(object):
     @staticmethod
     def delete(session, id):
         uri = f'/iaas/machines/{id}'
-        session._request(f'{session.baseurl}{uri}', request_method='DELETE')
+        session._request(f'{session.baseurl}{uri}',
+                         request_method='DELETE'
+                         )
+
+    @staticmethod
+    def find_by_user(session, user):
+        uri = (f"/iaas/machines?$filter=(((type eq 'VM_GUEST') and "
+               f"(lifecycleState ne 'RETIRED')) and "
+               f"(tenantLinks.item eq "
+               f"'/owner/provisioning/auth/csp/users/{user}'))"
+               )
+        return session._request(f'{session.baseurl}{uri}')['content']
 
     @staticmethod
     def list_orphaned(session):

@@ -3,6 +3,7 @@ import json
 import os
 import sys
 
+
 class Request(object):
     def __init__(self, request):
         self.request_tracker_link = request['requestTrackerLink']
@@ -24,19 +25,24 @@ class Request(object):
         self.tenants = request['tenants']
         try:
             self.blueprint_id = request['blueprintId']
-        except KeyError: pass
+        except KeyError:
+            pass
         try:
             self.description = request['description']
-        except KeyError: pass
+        except KeyError:
+            pass
         try:
             self.deployment_id = request['deploymentId']
-        except KeyError: pass
+        except KeyError:
+            pass
         try:
             self.failure_message = request['failureMessage']
-        except KeyError: pass
+        except KeyError:
+            pass
         try:
             self.validation_messages = request['validationMessages']
-        except KeyError: pass
+        except KeyError:
+            pass
 
     @classmethod
     def list(cls, session):
@@ -45,11 +51,14 @@ class Request(object):
         data = []
         for i in j:
             i = os.path.split(i)[1]
-            data.append({ "id" : i })
+            data.append({"id": i})
         return data
 
     @classmethod
-    def describe(cls, session, id):
+    def describe(cls,
+                 session,
+                 id
+                 ):
         uri = f'/blueprint/api/blueprint-requests/{id}'
         return cls(session._request(f'{session.baseurl}{uri}'))
 
@@ -59,11 +68,12 @@ class Request(object):
         return session._request(f'{session.baseurl}{uri}')
 
     @classmethod
-    def list_incomplete(cls, session):
+    def list_incomplete(cls,
+                        session):
         r = cls.list(session)
         data = []
         for i in r:
             d = cls.describe(session, i['id'])
             if d.status == 'STARTED':
-                data.append({ "id" : d.id })
+                data.append({"id": d.id})
         return data
