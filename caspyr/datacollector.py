@@ -22,4 +22,6 @@ class DataCollector(object):
     @staticmethod
     def delete(session, id):
         uri = f'/iaas/data-collectors/{id}'
-        return session._request(f'{session.baseurl}{uri}', request_method='DELETE')
+        return session._request(f'{session.baseurl}{uri}',
+                                request_method='DELETE'
+                                )

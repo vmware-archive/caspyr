@@ -3,6 +3,7 @@ import json
 import os
 import sys
 
+
 class CloudZone(object):
     """
     Classes for Cloud Zone methods.
@@ -10,17 +11,18 @@ class CloudZone(object):
     def __init__(self, zone):
         try:
             self.tags = zone['tags']
-        except KeyError: pass
+        except KeyError:
+            pass
         try:
             self.tags_to_match = zone['tagsToMatch']
-        except KeyError: pass
+        except KeyError:
+            pass
         self.placement_policy = zone['placementPolicy']
         self.name = zone['name']
         self.id = zone['id']
         self.updated_at = zone['updatedAt']
         self._links = zone['_links']
         self.region_id = os.path.split(self._links['region']['href'])[1]
-
 
     @staticmethod
     def list(session):
@@ -30,17 +32,31 @@ class CloudZone(object):
         return j['content']
 
     @classmethod
-    def describe(cls, session, id):
+    def describe(cls,
+                 session,
+                 id
+                 ):
         uri = f'/iaas/zones/{id}'
         return cls(session._request(f'{session.baseurl}{uri}'))
 
     @classmethod
-    def describe_by_name(cls, session, name):
+    def describe_by_name(cls,
+                         session,
+                         name
+                         ):
         uri = f'/iaas/zones?$filter=(name eq \'{name}\')'
         return cls(session._request(f'{session.baseurl}{uri}')['content'][0])
 
     @classmethod
-    def create(cls, session, name, region_id, placement_policy = 'DEFAULT', tags = [], tags_to_match = [], description = ''):
+    def create(cls,
+               session,
+               name,
+               region_id,
+               placement_policy='DEFAULT',
+               tags=[],
+               tags_to_match=[],
+               description=''
+               ):
         uri = '/iaas/zones/'
         payload = {
             "name": name,
@@ -50,9 +66,14 @@ class CloudZone(object):
             "tags": tags,
             "tagsToMatch": tags_to_match
         }
-        return cls(session._request(url=f'{session.baseurl}{uri}', request_method='POST', payload=payload))
+        return cls(session._request(url=f'{session.baseurl}{uri}',
+                                    request_method='POST',
+                                    payload=payload
+                                    ))
 
     @staticmethod
     def delete(session, id):
         uri = f'/iaas/zones/{id}'
-        return session._request(f'{session.baseurl}{uri}', request_method='DELETE')
+        return session._request(f'{session.baseurl}{uri}',
+                                request_method='DELETE'
+                                )

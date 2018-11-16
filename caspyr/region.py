@@ -1,9 +1,12 @@
 class Region(object):
     """
     Class for Region methods.
-    Used to discover regions for all fabric constructs (images, mappings, networks and storage.)
+    Used to discover regions for all fabric constructs (images, mappings,
+    networks and storage.)
     """
-    def __init__(self, region):
+    def __init__(self,
+                 region
+                 ):
         self.external_region_id = region['externalRegionId']
         self.id = region['id']
         self.updated_at = region['updatedAt']

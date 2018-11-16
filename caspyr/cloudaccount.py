@@ -3,6 +3,9 @@ import json
 import os
 import sys
 from abc import ABCMeta, abstractmethod, ABC
+import logging
+
+logger = logging.getLogger('caspyr.__name__')
 
 
 class Base(metaclass=ABCMeta):
@@ -17,14 +20,15 @@ class Base(metaclass=ABCMeta):
         self.organization = cloudaccount['organizationId']
         self._links = cloudaccount['_links']
         self.custom_properties = cloudaccount['customProperties']
+        self.cloud_account_properties = cloudaccount['cloudAccountProperties']
         try:
             self.type = cloudaccount['type']
-        except:
-            KeyError
+        except KeyError:
+            pass
         try:
             self.description = cloudaccount['description']
-        except:
-            KeyError
+        except KeyError:
+            pass
 
     @classmethod
     @abstractmethod
@@ -71,6 +75,15 @@ class Base(metaclass=ABCMeta):
         """
         return session._request(url=f'{session.baseurl}{uri}',
                                 request_method='DELETE')
+
+    @staticmethod
+    @abstractmethod
+    def update(session, id, payload):
+        uri = f'/iaas/cloud-accounts/{id}'
+        return session._request(url=f'{session.baseurl}{uri}',
+                                request_method='PATCH',
+                                payload=payload
+                                )
 
 
 class CloudAccount(Base):
@@ -207,7 +220,7 @@ class CloudAccountvSphere(Base):
     @classmethod
     def list(cls, session):
         uri = '/iaas/cloud-accounts-vsphere'
-        return super().list(session, uri)['content']
+        return super().list(session, uri)
 
     @classmethod
     def describe(cls, session, id):
@@ -236,6 +249,30 @@ class CloudAccountvSphere(Base):
                nsx_cloud_account=None,
                description=None
                ):
+        """[summary]
+
+        :param session: [description]
+        :type session: [type]
+        :param name: [description]
+        :type name: [type]
+        :param fqdn: [description]
+        :type fqdn: [type]
+        :param rdc: [description]
+        :type rdc: [type]
+        :param username: [description]
+        :type username: [type]
+        :param password: [description]
+        :type password: [type]
+        :param datacenter_moid: [description]
+        :type datacenter_moid: [type]
+        :param nsx_cloud_account: [description], defaults to None
+        :param nsx_cloud_account: [type], optional
+        :param description: [description], defaults to None
+        :param description: [type], optional
+        :return: [description]
+        :rtype: [type]
+        """
+
         uri = '/iaas/cloud-accounts-vsphere'
         payload = {
             "name": name,

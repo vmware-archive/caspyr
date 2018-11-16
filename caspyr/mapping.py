@@ -4,9 +4,11 @@ import os
 import sys
 from abc import ABCMeta, abstractmethod, ABC
 
+
 class StorageProfile(metaclass=ABCMeta):
     """
-    Metaclass for common model attributes across AWS/Azure/vSphere Storage Profiles.
+    Metaclass for common model attributes across AWS/Azure/vSphere
+    Storage Profiles.
     """
     def __init__(self, profile):
         self.external_region_id = profile['externalRegionId']
@@ -20,13 +22,16 @@ class StorageProfile(metaclass=ABCMeta):
         self.organization_id = profile['organizationId']
         try:
             self.azure_storage_policies = profile['azureStoragePolicies']
-        except KeyError: pass
+        except KeyError:
+            pass
         try:
             self.aws_storage_policies = profile['awsStoragePolicies']
-        except KeyError: pass
+        except KeyError:
+            pass
         try:
             self.vsphere_storage_policies = profile['vsphereStoragePolicies']
-        except KeyError: pass
+        except KeyError:
+            pass
 
     @staticmethod
     def list(session):
@@ -36,7 +41,10 @@ class StorageProfile(metaclass=ABCMeta):
     @staticmethod
     def delete(session, id):
         uri = f'/iaas/storage-profiles/{id}'
-        return session._request(f'{session.baseurl}{uri}', request_method='DELETE')
+        return session._request(f'{session.baseurl}{uri}',
+                                request_method='DELETE'
+                                )
+
 
 class StorageProfileAzure(StorageProfile):
     def __init__(self, storageprofile):
@@ -55,27 +63,50 @@ class StorageProfileAzure(StorageProfile):
     @staticmethod
     def delete(session, id):
         uri = f'/iaas/storage-profiles-azure/{id}'
-        return session._request(f'{session.baseurl}{uri}', request_method='DELETE')
+        return session._request(f'{session.baseurl}{uri}',
+                                request_method='DELETE'
+                                )
 
     @classmethod
-    def create(cls, session, name, region_id, policy_name, os_disk_caching, data_caching, storage_account_id=None, storage_type=None, supports_encryption=False, disk_type=None, tags=None, description=None, default_item=True, ):
+    def create(cls,
+               session,
+               name,
+               region_id,
+               policy_name,
+               os_disk_caching,
+               data_caching,
+               storage_account_id=None,
+               storage_type=None,
+               supports_encryption=False,
+               disk_type=None,
+               tags=None,
+               description=None,
+               default_item=True
+               ):
         """
         :param name: The name of the Storage Profile.
         :param description: A useful description for the Storage Profile
-        :param region_id: Will need to be pulled using Region.describe(session, (CloudZone.describe_by_name(session, name)['region_id'])['id']
-        :param default_item: Whether this should be the default policy used when the profile is selected.
-        :param storage_type: Can only be managed_disks or False. Defaults to None.
-        :param storage_account_id: Required for unmanaged disks. Defaults to None. Comes from /iaas/fabric-azure-storage-accounts
-        :param disk_type: Only required for managed_disks. Can be one of Standard_LRS or Premium_LRS.
+        :param region_id: Will need to be pulled using
+        Region.describe(session, (CloudZone.describe_by_name(session,
+                                                             name)['region_id'])['id']
+        :param default_item: Whether this should be the default policy used
+        when the profile is selected.
+        :param storage_type: Can only be managed_disks or False.
+        Defaults to None.
+        :param storage_account_id: Required for unmanaged disks.
+        Defaults to None. Comes from /iaas/fabric-azure-storage-accounts
+        :param disk_type: Only required for managed_disks. Can be one of
+        Standard_LRS or Premium_LRS.
         :param policy_name: The name of the policy within the profile.
-        :param tags: A list of tags in the following format - [{ "key": "foo", "value": "bar"}]
+        :param tags: A list of tags in the following format:
+        [{ "key": "foo", "value": "bar"}]
         """
         uri = f'/iaas/storage-profiles-azure/'
         payload = {
-            "name" : name,
-            "description" : description,
-            "regionId" : region_id,
-            "azureStoragePolicies" : [{
+            "name": name,
+            "description": description,
+            "regionId": region_id,
+            "azureStoragePolicies": [{
                 "storageAccountId": storage_account_id,
                 "storageType": storage_type,
                 "defaultItem": default_item,
@@ -88,7 +119,11 @@ class StorageProfileAzure(StorageProfile):
             }]
 
         }
-        return cls(session._request(f'{session.baseurl}{uri}', request_method='POST', payload=payload))
+        return cls(session._request(f'{session.baseurl}{uri}',
+                                    request_method='POST',
+                                    payload=payload
+                                    ))
+
 
 class StorageProfileAWS(StorageProfile):
     def __init__(self, storageprofile):
@@ -99,11 +134,12 @@ class StorageProfileAWS(StorageProfile):
         uri = '/iaas/storage-profiles-aws/'
         return session._request(f'{session.baseurl}{uri}')['content']
 
-
     @staticmethod
     def delete(session, id):
         uri = f'/iaas/storage-profiles-aws/{id}'
-        return session._request(f'{session.baseurl}{uri}', request_method='DELETE')
+        return session._request(f'{session.baseurl}{uri}',
+                                request_method='DELETE'
+                                )
 
     @classmethod
     def describe(cls, session, id):
@@ -111,24 +147,42 @@ class StorageProfileAWS(StorageProfile):
         return cls(session._request(f'{session.baseurl}{uri}'))
 
     @classmethod
-    def create(cls, session, name, region_id, policy_name, device_type, tags= None, volume_type=None, description=None, default_item=True, supports_encryption=False):
+    def create(cls,
+               session,
+               name,
+               region_id,
+               policy_name,
+               device_type,
+               tags=None,
+               volume_type=None,
+               description=None,
+               default_item=True,
+               supports_encryption=False
+               ):
         '''
         :param name: The name of the Storage Profile.
         :param description: A useful description for the Storage Profile
-        :param region_id: Will need to be pulled using Region.describe(session, (CloudZone.describe_by_name(session, name)['region_id'])['id']
-        :param default_item: Whether this should be the default policy used when the profile is selected.
-        :param supports_encryption: A flag to indicate whether policy supports encrypted volumes. Maps to encrypted attribute of the disk in the blueprint schema.
+        :param region_id: Will need to be pulled using
+        Region.describe(session, (CloudZone.describe_by_name(session,
+                                                             name)['region_id'])['id']
+        :param default_item: Whether this should be the default policy used
+        when the profile is selected.
+        :param supports_encryption: A flag to indicate whether policy supports
+        encrypted volumes. Maps to encrypted attribute of the disk in the
+        blueprint schema.
         :param device_type: One of EBS or Instance Store.
-        :param volume_type: For EBS, one of gp2, io1, sc1, st1 or standard (magnetic). For Instance Store this value is not required.
+        :param volume_type: For EBS, one of gp2, io1, sc1, st1 or standard
+        (magnetic). For Instance Store this value is not required.
         :param policy_name: The name of the policy within the profile.
-        :param tags: A list of tags in the following format - [{ "key": "foo", "value": "bar"}]
+        :param tags: A list of tags in the following format:
+        [{ "key": "foo", "value": "bar"}]
         '''
         uri = f'/iaas/storage-profiles-aws/'
         payload = {
-            "name" : name,
-            "description" : description,
-            "regionId" : region_id,
-            "awsStoragePolicies" : [{
+            "name": name,
+            "description": description,
+            "regionId": region_id,
+            "awsStoragePolicies": [{
                 "defaultItem": default_item,
                 "supportsEncryption": supports_encryption,
                 "deviceType": device_type,
@@ -138,7 +192,11 @@ class StorageProfileAWS(StorageProfile):
             }]
 
         }
-        return cls(session._request(f'{session.baseurl}{uri}', request_method='POST', payload=payload))
+        return cls(session._request(f'{session.baseurl}{uri}',
+                                    request_method='POST',
+                                    payload=payload
+                                    ))
+
 
 class StorageProfilevSphere(StorageProfile):
     def __init__(self, storageprofile):
@@ -153,18 +211,21 @@ class StorageProfilevSphere(StorageProfile):
     @staticmethod
     def delete(session, id):
         uri = f'/iaas/storage-profiles-vsphere/{id}'
-        return session._request(f'{session.baseurl}{uri}', request_method='DELETE')
+        return session._request(f'{session.baseurl}{uri}',
+                                request_method='DELETE'
+                                )
+
 
 class ImageMapping(object):
     def __init__(self, mapping):
-        self.id=mapping['id']
-        self.name=mapping['name']
-        self.description=mapping['description']
-        self.updated_at=mapping['updatedAt']
-        self.organization_id=mapping['organizationId']
-        self.external_region_id=mapping['externalRegionId']
-        self._links=mapping['_links']
-        self.image_mappings=mapping['imageMappings']
+        self.id = mapping['id']
+        self.name = mapping['name']
+        self.description = mapping['description']
+        self.updated_at = mapping['updatedAt']
+        self.organization_id = mapping['organizationId']
+        self.external_region_id = mapping['externalRegionId']
+        self._links = mapping['_links']
+        self.image_mappings = mapping['imageMappings']
 
     @staticmethod
     def list(session):
@@ -179,10 +240,19 @@ class ImageMapping(object):
     @staticmethod
     def delete(session, id):
         uri = f'/iaas/image-profiles/{id}'
-        return session._request(f'{session.baseurl}{uri}', request_method='DELETE')
+        return session._request(f'{session.baseurl}{uri}',
+                                request_method='DELETE'
+                                )
 
     @classmethod
-    def create(cls, session, name, image_name, image_id, region_id, description=None):
+    def create(cls,
+               session,
+               name,
+               image_name,
+               image_id,
+               region_id,
+               description=None
+               ):
         uri = '/iaas/image-profiles'
         payload = {
             "name": name,
@@ -195,7 +265,11 @@ class ImageMapping(object):
                 }
             }
         }
-        return (session._request(f'{session.baseurl}{uri}', request_method='POST', payload=payload))
+        return (session._request(f'{session.baseurl}{uri}',
+                                 request_method='POST',
+                                 payload=payload
+                                 ))
+
 
 class Flavor(object):
     def __init__(self, flavor):
@@ -212,19 +286,20 @@ class Flavor(object):
         j = session._request(f'{session.baseurl}{uri}')['content'][0]
         return cls(j)
 
+
 class FlavorMapping(object):
     def __init__(self, mapping):
-        self.id=mapping['id']
-        self.name=mapping['name']
+        self.id = mapping['id']
+        self.name = mapping['name']
         try:
-            self.description=mapping['description']
-        except:
-            KeyError
-        self.updated_at=mapping['updatedAt']
-        self.organization_id=mapping['organizationId']
-        self.external_region_id=mapping['externalRegionId']
-        self._links=mapping['_links']
-        self.flavor_mappings=mapping['flavorMappings']
+            self.description = mapping['description']
+        except KeyError:
+            pass
+        self.updated_at = mapping['updatedAt']
+        self.organization_id = mapping['organizationId']
+        self.external_region_id = mapping['externalRegionId']
+        self._links = mapping['_links']
+        self.flavor_mappings = mapping['flavorMappings']
 
     @staticmethod
     def list(session):
@@ -235,13 +310,25 @@ class FlavorMapping(object):
     @staticmethod
     def delete(session, id):
         uri = f'/iaas/flavor-profiles/{id}'
-        return session._request(f'{session.baseurl}{uri}', request_method='DELETE')
+        return session._request(f'{session.baseurl}{uri}',
+                                request_method='DELETE'
+                                )
 
     @classmethod
-    def create(cls, session, name, mapping_name, region_id, flavor_name=None, cpuCount=None, memoryGb=None, memoryMb=None, description=None):
-        uri='/iaas/flavor-profiles/'
+    def create(cls,
+               session,
+               name,
+               mapping_name,
+               region_id,
+               flavor_name=None,
+               cpuCount=None,
+               memoryGb=None,
+               memoryMb=None,
+               description=None
+               ):
+        uri = '/iaas/flavor-profiles/'
         if memoryGb:
-            memoryMb=memoryGb*1024
+            memoryMb = memoryGb*1024
         payload = {
             "name": name,
             "description": description,
@@ -254,7 +341,11 @@ class FlavorMapping(object):
                 }
             }
         }
-        return cls(session._request(f'{session.baseurl}{uri}', request_method='POST', payload=payload))
+        return cls(session._request(f'{session.baseurl}{uri}',
+                                    request_method='POST',
+                                    payload=payload
+                                    ))
+
 
 class NetworkProfile(object):
     """
@@ -287,7 +378,7 @@ class NetworkProfile(object):
                security_group_ids=None,
                isolation_network_domain_id=None,
                isolation_network_domain_cidr=None,
-               isolation_external_network_fabric_id=None,
+               isolation_ext_net_fabric_id=None,
                isolated_network_cidr_prefix=None,
                description=None,
                tags=None):
@@ -308,7 +399,8 @@ class NetworkProfile(object):
         :param isolation_network_domain_id: [type], optional
         :param isolation_network_domain_cidr: [description], defaults to None
         :param isolation_network_domain_cidr: [type], optional
-        :param isolation_external_network_fabric_id: [description], defaults to None
+        :param isolation_external_network_fabric_id: [description].
+        Defaults to None.
         :param isolation_external_network_fabric_id: [type], optional
         :param isolated_network_cidr_prefix: [description], defaults to None
         :param isolated_network_cidr_prefix: [type], optional
@@ -324,21 +416,26 @@ class NetworkProfile(object):
             "name": name,
             "description": description,
             "regionId": region_id,
-            "fabricNetworkIds" : network_ids,
-            "isolationType" : isolation_type,
-            "securityGroupIds" : security_group_ids,
+            "fabricNetworkIds": network_ids,
+            "isolationType": isolation_type,
+            "securityGroupIds": security_group_ids,
             "isolationNetworkDomainId": isolation_network_domain_id,
             "isolationNetworkDomainCIDR": isolation_network_domain_cidr,
-            "isolationExternalFabricNetworkId": isolation_external_network_fabric_id,
+            "isolationExternalFabricNetworkId": isolation_ext_net_fabric_id,
             "isolatedNetworkCIDRPrefix": isolated_network_cidr_prefix,
             "tags": tags
         }
-        return cls(session._request(f'{session.baseurl}{uri}', request_method='POST', payload=payload))
+        return cls(session._request(f'{session.baseurl}{uri}',
+                                    request_method='POST',
+                                    payload=payload
+                                    ))
 
     @staticmethod
     def delete(session, id):
         uri = f'/iaas/network-profiles/{id}'
-        return session._request(f'{session.baseurl}{uri}', request_method='DELETE')
+        return session._request(f'{session.baseurl}{uri}',
+                                request_method='DELETE'
+                                )
 
     @classmethod
     def describe(cls, session, id):

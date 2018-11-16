@@ -1,7 +1,16 @@
 import requests
 import json
-import sys
 import logging
+import os
+
+
+logging.basicConfig(level=os.getenv('caspyr_log_level'),
+                    format='%(asctime)s %(name)s %(levelname)s %(message)s'
+                    )
+logger = logging.getLogger(f'caspyr.{__name__}')
+logging.getLogger('requests').setLevel(logging.CRITICAL)
+logging.getLogger('urllib3').setLevel(logging.CRITICAL)
+
 
 class Session(object):
     """
@@ -11,86 +20,101 @@ class Session(object):
     Requires refresh token from VMware Cloud Services portal to instantiate.
     """
     def __init__(self, auth_token):
-        self.token = 'Bearer '+auth_token
-        self.headers = {'Content-Type':'application/json','authorization': self.token}
+        self.token = auth_token
+        self.headers = {'Content-Type': 'application/json',
+                        'csp-auth-token': self.token}
         self.baseurl = 'https://api.mgmt.cloud.vmware.com'
 
     @classmethod
     def login(self, refresh_token):
-            baseurl = 'https://api.mgmt.cloud.vmware.com'
-            uri = '/iaas/login'
-            headers = {'Content-Type':'application/json'}
-            payload = json.dumps({"refreshToken": refresh_token })
+            baseurl = 'https://console.cloud.vmware.com/csp/gateway/am/api'
+            uri = f'/auth/api-tokens/authorize?refresh_token={refresh_token}'
+            headers = {'Content-Type': 'application/json'}
+            payload = {}
+            logger.debug(f'POST to: {baseurl}{uri} '
+                         f'with headers: {headers} '
+                         f'and body: {payload}.'
+                         )
+
             try:
-                r = requests.post(f'{baseurl}{uri}', headers = headers, data = payload)
+                r = requests.post(f'{baseurl}{uri}',
+                                  headers=headers,
+                                  data=payload)
+                logger.debug(f'Response: {r.json()}')
                 r.raise_for_status()
-                auth_token = r.json()['token']
+                logger.info('Authenticated successfully.')
+                auth_token = r.json()['access_token']
                 return self(auth_token)
-            except requests.exceptions.HTTPError as e:
-                print(e)
-                raise e
+            except requests.exceptions.HTTPError:
+                logger.error('Failed to authenticate.')
+                logger.error(f'Error message {r.json()["message"]}',
+                             exc_info=False)
 
-
-    def _request(self, url, request_method='GET', payload=None, log_level='INFO', **kwargs):
+    def _request(self,
+                 url,
+                 request_method='GET',
+                 payload=None,
+                 **kwargs
+                 ):
         """
         Inspired by the work of Russell Pope.
-        :param url: The complete uri for the requested resource. You should include the leading /
-        :param request_method: An HTTP method that is either PUT, POST, PATCH, DELETE or GET
-        :param payload: Used to store a resource that is used in either POST or PUT operations
+        :param url: The complete uri for the requested resource.
+        You must include the leading /
+        :param request_method: An HTTP method that one of
+        PUT, POST, PATCH, DELETE or GET
+        :param payload: Used to store a resource that is used in either
+        POST, PATCH or PUT operations
         :param kwargs: Unused currently
         :return: The response JSON
-
         """
-        numeric_level = getattr(logging, log_level.upper(), None)
-        if not isinstance(numeric_level, int):
-            raise ValueError('Invalid log level: %s' % log_level)
-        logging.basicConfig(level=numeric_level)
 
-        if url.startswith('https://console.cloud.vmware.com'):
-            self.headers.update({'csp-auth-token' : self.token.split(" ")[1]})
         if request_method in ('PUT', 'POST', 'PATCH') and payload:
             if type(payload) == dict:
                 payload = json.dumps(payload)
-
             try:
                 r = requests.request(request_method,
-                                    url=url,
-                                    headers=self.headers,
-                                    data=payload)
-
-                logging.info(f'{request_method} to {url} with payload {payload}')
-                logging.info(f'request response code {r.status_code}')
-                logging.info(f'request content {r.json()}')
+                                     url=url,
+                                     headers=self.headers,
+                                     data=payload)
+                logger.debug(f'{request_method} to {url} '
+                             f'with headers {self.headers} '
+                             f'and body {payload}.'
+                             )
+                logger.debug(f'Request response: {r.json()}')
                 r.raise_for_status()
                 return r.json()
-
-            except requests.exceptions.HTTPError as e:
-                logging.error(f'request failed with {e}. {r.json()}')
-                raise e
+            except requests.exceptions.HTTPError:
+                logger.error(r.json(),
+                             exc_info=False
+                             )
 
         elif request_method == 'GET':
             try:
                 r = requests.request(request_method,
-                                    url=url,
-                                    headers=self.headers)
-                logging.info(f'{request_method} to {url}')
-                logging.info(f'request response code {r.status_code}')
-                logging.info(f'request content {r.json}')
+                                     url=url,
+                                     headers=self.headers)
+                logger.debug(f'POST to {url} '
+                             f'with headers {self.headers}.'
+                             )
+                logger.debug(f'Request response: {r.json()}')
                 r.raise_for_status()
                 return r.json()
-            except requests.exceptions.HTTPError as e:
-                logging.error(f'request failed with {e}')
-                print (e)
+            except requests.exceptions.HTTPError:
+                logger.error(r.json()['message'],
+                             exc_info=False
+                             )
 
         elif request_method == 'DELETE':
             try:
                 r = requests.request(request_method,
-                                    url=url,
-                                    headers=self.headers)
-                logging.info(f'{request_method} to {url}')
-                logging.info(f'request response code {r.status_code}')
+                                     url=url,
+                                     headers=self.headers)
+                logger.debug(f'POST to {url} '
+                             f'with headers {self.headers}.'
+                             )
                 r.raise_for_status()
                 return r.status_code
-            except requests.exceptions.HTTPError as e:
-                logging.error(f'request failed with {e}')
-                print (e)
+            except requests.exceptions.HTTPError:
+                logger.error(r.json()['message'],
+                             exc_info=False
+                             )
