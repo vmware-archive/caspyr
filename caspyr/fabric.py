@@ -35,13 +35,13 @@ class Image(object):
         :param image: The name of the image you want to describe.
         :type image: string
         :param region: The external region id value (friendly name of the
-        region - eg. westus or us-west-1).
+        :type region - eg. westus or us-west-1).
         :return: Returns an instance of the image claass.
         :rtype: Image
         """
 
-        uri = (f'/iaas/fabric-images?$filter=(name eq \'{image}\') and '
-               '(externalRegionId eq {region})')
+        uri = f'/iaas/fabric-images?$filter=(name eq \'{image}\') and (externalRegionId eq \'{region}\')'
+
         j = session._request(f'{session.baseurl}{uri}')['content'][0]
         return cls(j)
 
