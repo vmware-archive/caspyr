@@ -7,7 +7,7 @@ import os
 logging.basicConfig(level=os.getenv('caspyr_log_level'),
                     format='%(asctime)s %(name)s %(levelname)s %(message)s'
                     )
-logger = logging.getLogger(f'caspyr.{__name__}')
+logger = logging.getLogger(__name__)
 logging.getLogger('requests').setLevel(logging.CRITICAL)
 logging.getLogger('urllib3').setLevel(logging.CRITICAL)
 
@@ -93,7 +93,7 @@ class Session(object):
                 r = requests.request(request_method,
                                      url=url,
                                      headers=self.headers)
-                logger.debug(f'POST to {url} '
+                logger.debug(f'{request_method} to {url} '
                              f'with headers {self.headers}.'
                              )
                 logger.debug(f'Request response: {r.json()}')
@@ -109,7 +109,7 @@ class Session(object):
                 r = requests.request(request_method,
                                      url=url,
                                      headers=self.headers)
-                logger.debug(f'POST to {url} '
+                logger.debug(f'{request_method} to {url} '
                              f'with headers {self.headers}.'
                              )
                 r.raise_for_status()
