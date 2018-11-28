@@ -78,9 +78,8 @@ class User(object):
                                           ),
                 'serviceRoleNames':
                     [
-                        'automationservice: user',
-                        'automationservice: manager',
-                        'automationservice: cloud_admin'
+                        'automationservice:user',
+                        'automationservice:cloud_admin'
                     ]
             })
 
@@ -106,8 +105,8 @@ class User(object):
                                           ),
                 'serviceRoleNames':
                 [
-                    'catalog: admin',
-                    'catalog: user'
+                    'catalog:admin',
+                    'catalog:user'
                 ]
             })
 
@@ -119,8 +118,8 @@ class User(object):
                                           ),
                 'serviceRoleNames':
                     [
-                        'log-intelligence: admin',
-                        'log-intelligence: user'
+                        'log-intelligence:admin',
+                        'log-intelligence:user'
                     ]
             })
 
@@ -132,8 +131,8 @@ class User(object):
                                           ),
                 'serviceRoleNames':
                     [
-                        'vrni: admin',
-                        'vrni: user'
+                        'vrni:admin',
+                        'vrni:user'
                     ]
             })
 
