@@ -1,3 +1,6 @@
+import json
+
+
 class Network(object):
     def __init__(self, network):
         pass
@@ -49,5 +52,15 @@ class Machine(object):
 
     @staticmethod
     def list_orphaned(session):
-        uri = f'/iaas/machines?$filter=projectId eq \'*\''
-        return session._request(f'{session.baseurl}{uri}')['content']
+        uri = f'/provisioning/uerp/resources/compute?$filter=customProperties.__groupResourcePlacementLink eq *'
+        return session._request(f'{session.baseurl}{uri}')['documentLinks']
+
+    @staticmethod
+    def unregister(session, uri):
+        uri = f'/provisioning/uerp{uri}'
+        payload = session._request(f'{session.baseurl}{uri}')
+        payload['customProperties']['__groupResourcePlacementLink'] = ""
+        return session._request(f'{session.baseurl}{uri}',
+                                request_method='PATCH',
+                                payload=payload
+                                )
