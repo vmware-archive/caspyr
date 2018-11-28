@@ -1,11 +1,4 @@
-import requests
-import json
-import os
-import sys
 from abc import ABCMeta, abstractmethod, ABC
-import logging
-
-logger = logging.getLogger('caspyr.__name__')
 
 
 class Base(metaclass=ABCMeta):
