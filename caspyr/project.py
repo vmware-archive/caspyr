@@ -10,9 +10,18 @@ class Project(object):
     """
 
     def __init__(self, project):
-        self.administrators = project['administrators']
-        self.members = project['members']
-        self.zones = project['zones']
+        try:
+            self.administrators = project['administrators']
+        except KeyError:
+            pass
+        try:
+            self.members = project['members']
+        except KeyError:
+            pass
+        try:
+            self.zones = project['zones']
+        except KeyError:
+            pass
         self.name = project['name']
         try:
             self.description = project['description']
