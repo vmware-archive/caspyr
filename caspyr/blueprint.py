@@ -1,7 +1,6 @@
-import requests
-import json
 import os
-import sys
+
+import requests
 
 
 class Blueprint(object):

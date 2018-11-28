@@ -1,8 +1,4 @@
-import requests
-import json
-import os
-import sys
-from abc import ABCMeta, abstractmethod, ABC
+from abc import ABCMeta
 
 
 class StorageProfile(metaclass=ABCMeta):
