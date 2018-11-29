@@ -111,6 +111,7 @@ class Blueprint:
                number,
                raw_data_url
                ):
+
         # pylint: disable=too-many-arguments
         # require these arguments to create a bueprint
 
@@ -160,8 +161,10 @@ class Blueprint:
                 plan=False,
                 destroy=False
                 ):
+
         # pylint: disable=too-many-arguments
         # require these arguments to submit a blueprint request
+
         uri = '/blueprint/api/blueprint-requests'
         payload = {
             "deploymentName": deployment_name,
