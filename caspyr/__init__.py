@@ -1,4 +1,5 @@
-"""This module allows you to interact with the
+"""This module has been written by Cody DeArkland and
+Grant Orchard. It allows you to interact with the
 VMware Cloud Automation Services APIs in a programmatic manner.
 """
 
