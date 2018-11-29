@@ -1,8 +1,8 @@
-import requests
 import json
 import logging
 import os
 
+import requests
 
 logging.basicConfig(level=os.getenv('caspyr_log_level'),
                     format='%(asctime)s %(name)s %(levelname)s %(message)s'

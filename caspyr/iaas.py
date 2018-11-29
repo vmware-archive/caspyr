@@ -1,6 +1,3 @@
-import json
-
-
 class Network(object):
     def __init__(self, network):
         pass

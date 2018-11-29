@@ -4,11 +4,6 @@ underlying information for creating Image Mappings, Flavor Mappings, Network
 Profiles and Storage Profiles.
 """
 
-import requests
-import json
-import os
-import sys
-
 
 class Image(object):
     def __init__(self, image):
