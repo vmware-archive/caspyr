@@ -1,9 +1,3 @@
-import requests
-import json
-import os
-import sys
-
-
 class Project(object):
     """
     Class for Project methods

@@ -1,9 +1,3 @@
-import requests
-import json
-import os
-import sys
-
-
 class Deployment(object):
     """
     Classes for Cloud Zone methods.

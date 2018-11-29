@@ -1,7 +1,4 @@
-import requests
-import json
 import os
-import sys
 
 
 class CloudZone(object):
