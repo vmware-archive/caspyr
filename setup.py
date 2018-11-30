@@ -1,11 +1,11 @@
 import os
-import sys
 
+import sys
 from setuptools import setup
 
 CURRENT_PYTHON = sys.version_info[:2]
-MIN_REQUIRED_PYTHON = (3, 5)
-MAX_REQUIRED_PYTHON = (3, 6)
+MIN_REQUIRED_PYTHON = (3, 6)
+MAX_REQUIRED_PYTHON = (3, 7)
 
 if not MIN_REQUIRED_PYTHON <= CURRENT_PYTHON <= MAX_REQUIRED_PYTHON:
 	sys.stderr.write(
@@ -21,9 +21,8 @@ with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
 	long_description = f.read()
 
 setup(
-	name='caspyr',
+	name='cassdk',
 	version='0.0.1',  # placeholder
-	packages=['caspyr'],
 	url='https://github.com/grantorchard/caspyr',
 	license='',
 	author='Grant Orchard',
@@ -41,4 +40,5 @@ setup(
 	project_urls={
 		'Source': 'https://github.com/grantorchard/caspyr',
 	},
+	platforms=["python_version >= '3.6'", "python_version <= '3.7'"]
 )
