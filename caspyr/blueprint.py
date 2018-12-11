@@ -128,10 +128,11 @@ class Blueprint:
             'content': data_string,
             'version': version
         }
-        return cls(session._request(f'{session.baseurl}{uri}',
+        
+        return session._request(f'{session.baseurl}{uri}',
                                     request_method='POST',
                                     payload=payload
-                                    ))
+                                    )
 
     @staticmethod
     def list_provider_resources(session):
