@@ -105,31 +105,34 @@ class Blueprint:
     @classmethod
     def create(cls,
                session,
+               projectId, 
                bpname,
-               displayname,
                description,
-               number,
-               raw_data_url
+               version,
+               repo,
+               filename,
+               branch='master'
                ):
 
         # pylint: disable=too-many-arguments
         # require these arguments to create a bueprint
 
         uri = '/blueprint/api/blueprints'
-        data = requests.get(raw_data_url)
+        data = requests.get(f'https://raw.githubusercontent.com/{repo}/{branch}/{filename}')
         data_string = data.text
         payload = {
+            'projectId': projectId,
             'name': bpname,
-            'displayName': displayname,
             'description': description,
-            'iteration': number,
             'tags': [],
-            'content': data_string
+            'content': data_string,
+            'version': version
         }
-        return cls(session._request(f'{session.baseurl}{uri}',
+        
+        return session._request(f'{session.baseurl}{uri}',
                                     request_method='POST',
                                     payload=payload
-                                    ))
+                                    )
 
     @staticmethod
     def list_provider_resources(session):
