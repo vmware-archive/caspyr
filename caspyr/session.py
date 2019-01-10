@@ -45,10 +45,11 @@ class Session(object):
                 logger.info('Authenticated successfully.')
                 auth_token = r.json()['access_token']
                 return self(auth_token)
-            except requests.exceptions.HTTPError:
+            except requests.exceptions.HTTPError as e:
                 logger.error('Failed to authenticate.')
                 logger.error(f'Error message {r.json()["message"]}',
                              exc_info=False)
+                raise e
 
     def _request(self,
                  url,
