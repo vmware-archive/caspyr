@@ -35,7 +35,7 @@ class User(object):
     def find(session, id, search):
         baseurl = 'https://console.cloud.vmware.com'
         uri = (f'/csp/gateway/portal/api/orgs/{id}/users/search?'
-               'userSearchTerm={search}')
+               f'userSearchTerm={search}')
         return session._request(f'{baseurl}{uri}')['results']
 
     @staticmethod
