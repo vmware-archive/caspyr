@@ -19,7 +19,7 @@ class Deployment(object):
     @staticmethod
     def list(session):
         uri = '/deployment/api/deployments'
-        return session._request(url=f'{session.baseurl}{uri}')['results']
+        return session._request(url=f'{session.baseurl}{uri}')['content']
 
     @staticmethod
     def delete(session, id):
@@ -43,7 +43,7 @@ class Deployment(object):
         uri = (f'/deployment/api/deployments'
                '?projects=/provisioning/resources/projects/{id}')
         ids = {}
-        j = session._request(url=f'{session.baseurl}{uri}')['results']
+        j = session._request(url=f'{session.baseurl}{uri}')['content']
         for i in j:
             ids['id'] = i['id']
             ids['name'] = i['name']
