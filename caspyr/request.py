@@ -3,7 +3,10 @@ import os
 
 class Request:
     def __init__(self, request):
-        self.request_tracker_link = request['requestTrackerLink']
+        try:
+            self.request_tracker_link = request['requestTrackerLink']
+        except KeyError:
+            pass
         self.deployment_name = request['deploymentName']
         self.reason = request['reason']
         self.plan = request['plan']
@@ -19,7 +22,10 @@ class Request:
         self.created_by = request['createdBy']
         self.updated_at = request['updatedAt']
         self.updated_by = request['updatedBy']
-        self.tenants = request['tenants']
+        try:
+            self.tenants = request['tenants']
+        except KeyError:
+            pass
         try:
             self.blueprint_id = request['blueprintId']
         except KeyError:
