@@ -36,10 +36,10 @@ class Project(object):
         return cls(session._request(f'{session.baseurl}{uri}'))
 
     @classmethod
-    def describe_by_name(cls, session, name):
+    def find_by_name(cls, session, name):
         j = cls.list(session)
         for i in j:
-            d = cls.describe(session, i)
+            d = cls.describe(session, i['id'])
             if d.name.lower() == name.lower():
                 return d
 
