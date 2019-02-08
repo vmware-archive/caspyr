@@ -25,7 +25,10 @@ class Blueprint:
         self.tags = blueprint['tags']
         self.content = blueprint['content']
         self.valid = blueprint['valid']
-        self.validation_messages = blueprint['validationMessages']
+        try:
+            self.validation_messages = blueprint['validationMessages']
+        except:
+            KeyError
         self.status = blueprint['status']
         self.project_id = blueprint['projectId']
         self.project_name = blueprint['projectName']
@@ -36,7 +39,6 @@ class Blueprint:
         self.created_by = blueprint['createdBy']
         self.updated_at = blueprint['updatedAt']
         self.updated_by = blueprint['updatedBy']
-        self.tenants = blueprint['tenants']
 
     @staticmethod
     def list(session):
@@ -105,34 +107,30 @@ class Blueprint:
     @classmethod
     def create(cls,
                session,
-               projectId, 
-               bpname,
+               project_id,
+               bp_name,
                description,
                version,
-               repo,
-               filename,
-               branch='master'
+               content
                ):
 
         # pylint: disable=too-many-arguments
         # require these arguments to create a bueprint
 
         uri = '/blueprint/api/blueprints'
-        data = requests.get(f'https://raw.githubusercontent.com/{repo}/{branch}/{filename}')
-        data_string = data.text
         payload = {
-            'projectId': projectId,
-            'name': bpname,
+            'projectId': project_id,
+            'name': bp_name,
             'description': description,
             'tags': [],
-            'content': data_string,
+            'content': content,
             'version': version
         }
-        
+
         return session._request(f'{session.baseurl}{uri}',
-                                    request_method='POST',
-                                    payload=payload
-                                    )
+                                request_method='POST',
+                                payload=payload
+                                )
 
     @staticmethod
     def list_provider_resources(session):
