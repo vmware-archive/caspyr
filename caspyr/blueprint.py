@@ -126,11 +126,13 @@ class Blueprint:
             'content': content,
             'version': version
         }
-
-        return session._request(f'{session.baseurl}{uri}',
-                                request_method='POST',
-                                payload=payload
-                                )
+        i = session._request(f'{session.baseurl}{uri}',
+                             request_method='POST',
+                             payload=payload
+                             )
+        return cls.describe(session,
+                            blueprint_id=i['id']
+                            )
 
     @staticmethod
     def list_provider_resources(session):
