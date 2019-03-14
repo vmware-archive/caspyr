@@ -25,7 +25,7 @@ with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
 setup(
     name='caspyr',
     version='0.0.1',  # placeholder
-    url='https://github.com/grantorchard/caspyr',
+    url='https://github.com/vmware/caspyr',
     license='Apache v2',
     author='Grant Orchard',
     author_email='gorchard@vmware.com',
@@ -41,7 +41,7 @@ setup(
         'Programming Language :: Python :: 3.7',
     ],
     project_urls={
-        'Source': 'https://github.com/grantorchard/caspyr',
+        'Source': 'https://github.com/vmware/caspyr',
     },
     platforms=["python_version >= '3.6'", "python_version <= '3.7'"]
 )
