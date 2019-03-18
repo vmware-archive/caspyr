@@ -1,3 +1,9 @@
+# Cloud Automation Services SDK for Python
+# Copyright (c) 2019 VMware, Inc. All Rights Reserved.
+
+# SPDX-License-Identifier: Apache-2.0
+
+
 from abc import ABCMeta
 
 
@@ -31,12 +37,12 @@ class StorageProfile(metaclass=ABCMeta):
 
     @staticmethod
     def list(session):
-        uri = '/iaas/storage-profiles'
+        uri = '/iaas/api/storage-profiles'
         return session._request(f'{session.baseurl}{uri}')['content']
 
     @staticmethod
     def delete(session, id):
-        uri = f'/iaas/storage-profiles/{id}'
+        uri = f'/iaas/api/storage-profiles/{id}'
         return session._request(f'{session.baseurl}{uri}',
                                 request_method='DELETE'
                                 )
@@ -48,17 +54,17 @@ class StorageProfileAzure(StorageProfile):
 
     @staticmethod
     def list(session):
-        uri = '/iaas/storage-profiles-azure/'
+        uri = '/iaas/api/storage-profiles-azure/'
         return session._request(f'{session.baseurl}{uri}')['content']
 
     @classmethod
     def describe(cls, session, id):
-        uri = f'/iaas/storage-profiles-azure/{id}'
+        uri = f'/iaas/api/storage-profiles-azure/{id}'
         return cls(session._request(f'{session.baseurl}{uri}'))
 
     @staticmethod
     def delete(session, id):
-        uri = f'/iaas/storage-profiles-azure/{id}'
+        uri = f'/iaas/api/storage-profiles-azure/{id}'
         return session._request(f'{session.baseurl}{uri}',
                                 request_method='DELETE'
                                 )
@@ -90,14 +96,14 @@ class StorageProfileAzure(StorageProfile):
         :param storage_type: Can only be managed_disks or False.
         Defaults to None.
         :param storage_account_id: Required for unmanaged disks.
-        Defaults to None. Comes from /iaas/fabric-azure-storage-accounts
+        Defaults to None. Comes from /iaas/api/fabric-azure-storage-accounts
         :param disk_type: Only required for managed_disks. Can be one of
         Standard_LRS or Premium_LRS.
         :param policy_name: The name of the policy within the profile.
         :param tags: A list of tags in the following format:
         [{ "key": "foo", "value": "bar"}]
         """
-        uri = f'/iaas/storage-profiles-azure/'
+        uri = f'/iaas/api/storage-profiles-azure/'
         payload = {
             "name": name,
             "description": description,
@@ -127,19 +133,19 @@ class StorageProfileAWS(StorageProfile):
 
     @staticmethod
     def list(session):
-        uri = '/iaas/storage-profiles-aws/'
+        uri = '/iaas/api/storage-profiles-aws/'
         return session._request(f'{session.baseurl}{uri}')['content']
 
     @staticmethod
     def delete(session, id):
-        uri = f'/iaas/storage-profiles-aws/{id}'
+        uri = f'/iaas/api/storage-profiles-aws/{id}'
         return session._request(f'{session.baseurl}{uri}',
                                 request_method='DELETE'
                                 )
 
     @classmethod
     def describe(cls, session, id):
-        uri = f'/iaas/storage-profiles-aws/{id}'
+        uri = f'/iaas/api/storage-profiles-aws/{id}'
         return cls(session._request(f'{session.baseurl}{uri}'))
 
     @classmethod
@@ -173,7 +179,7 @@ class StorageProfileAWS(StorageProfile):
         :param tags: A list of tags in the following format:
         [{ "key": "foo", "value": "bar"}]
         '''
-        uri = f'/iaas/storage-profiles-aws/'
+        uri = f'/iaas/api/storage-profiles-aws/'
         payload = {
             "name": name,
             "description": description,
@@ -200,13 +206,13 @@ class StorageProfilevSphere(StorageProfile):
 
     @staticmethod
     def list(session):
-        uri = '/iaas/storage-profiles-vsphere'
+        uri = '/iaas/api/storage-profiles-vsphere'
         j = session._request(f'{session.baseurl}{uri}')
         return j['content']
 
     @staticmethod
     def delete(session, id):
-        uri = f'/iaas/storage-profiles-vsphere/{id}'
+        uri = f'/iaas/api/storage-profiles-vsphere/{id}'
         return session._request(f'{session.baseurl}{uri}',
                                 request_method='DELETE'
                                 )
@@ -225,17 +231,17 @@ class ImageMapping(object):
 
     @staticmethod
     def list(session):
-        uri = '/iaas/image-profiles'
+        uri = '/iaas/api/image-profiles'
         j = session._request(f'{session.baseurl}{uri}')
         return j['content']
 
     def describe(self, session, id):
-        uri = f'/iaas/image-profiles/{id}'
+        uri = f'/iaas/api/image-profiles/{id}'
         return session._request(f'{session.baseurl}{uri}')['content']
 
     @staticmethod
     def delete(session, id):
-        uri = f'/iaas/image-profiles/{id}'
+        uri = f'/iaas/api/image-profiles/{id}'
         return session._request(f'{session.baseurl}{uri}',
                                 request_method='DELETE'
                                 )
@@ -249,7 +255,7 @@ class ImageMapping(object):
                region_id,
                description=None
                ):
-        uri = '/iaas/image-profiles'
+        uri = '/iaas/api/image-profiles'
         payload = {
             "name": name,
             "description": description,
@@ -273,12 +279,12 @@ class Flavor(object):
 
     @staticmethod
     def describe(session):
-        uri = f'/iaas/flavors/'
+        uri = f'/iaas/api/flavors/'
         return session._request(f'{session.baseurl}{uri}')['content']
 
     @classmethod
     def describe_by_name(cls, session, name):
-        uri = f'/iaas/flavors/'
+        uri = f'/iaas/api/flavors/'
         j = session._request(f'{session.baseurl}{uri}')['content'][0]
         return cls(j)
 
@@ -299,13 +305,13 @@ class FlavorMapping(object):
 
     @staticmethod
     def list(session):
-        uri = '/iaas/flavor-profiles'
+        uri = '/iaas/api/flavor-profiles'
         j = session._request(f'{session.baseurl}{uri}')
         return j['content']
 
     @staticmethod
     def delete(session, id):
-        uri = f'/iaas/flavor-profiles/{id}'
+        uri = f'/iaas/api/flavor-profiles/{id}'
         return session._request(f'{session.baseurl}{uri}',
                                 request_method='DELETE'
                                 )
@@ -322,7 +328,7 @@ class FlavorMapping(object):
                memoryMb=None,
                description=None
                ):
-        uri = '/iaas/flavor-profiles/'
+        uri = '/iaas/api/flavor-profiles/'
         if memoryGb:
             memoryMb = memoryGb*1024
         payload = {
@@ -360,7 +366,7 @@ class NetworkProfile(object):
 
     @classmethod
     def list(cls, session):
-        uri = '/iaas/network-profiles'
+        uri = '/iaas/api/network-profiles'
         j = session._request(f'{session.baseurl}{uri}')
         return j['content']
 
@@ -407,7 +413,7 @@ class NetworkProfile(object):
         :return: [description]
         :rtype: [type]
         """
-        uri = '/iaas/network-profiles'
+        uri = '/iaas/api/network-profiles'
         payload = {
             "name": name,
             "description": description,
@@ -428,12 +434,12 @@ class NetworkProfile(object):
 
     @staticmethod
     def delete(session, id):
-        uri = f'/iaas/network-profiles/{id}'
+        uri = f'/iaas/api/network-profiles/{id}'
         return session._request(f'{session.baseurl}{uri}',
                                 request_method='DELETE'
                                 )
 
     @classmethod
     def describe(cls, session, id):
-        uri = f'/iaas/network-profiles/{id}'
+        uri = f'/iaas/api/network-profiles/{id}'
         return cls(session._request(f'{session.baseurl}{uri}'))

@@ -1,3 +1,8 @@
+# Cloud Automation Services SDK for Python
+# Copyright (c) 2019 VMware, Inc. All Rights Reserved.
+
+# SPDX-License-Identifier: Apache-2.0
+
 """Module for interacting with Blueprints.
 """
 
@@ -54,10 +59,7 @@ class Blueprint:
         uri = '/blueprint/api/blueprints/'
         data = []
         j = session._request(f'{session.baseurl}{uri}')
-        for i in j['links']:
-            i = os.path.split(i)[1]
-            data.append({"id": i})
-        return data
+        return j['objects']
 
     @classmethod
     def describe(cls, session, blueprint_id):
@@ -74,7 +76,7 @@ class Blueprint:
         """
 
         uri = f'/blueprint/api/blueprints/{blueprint_id}'
-        return cls(session._request(f'{session.baseurl}{uri}'))
+        return cls(session._request(f'{session.baseurl}{uri}')[''])
 
     @staticmethod
     def get_inputs(session, blueprint_id):

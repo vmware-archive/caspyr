@@ -1,11 +1,16 @@
+# Cloud Automation Services SDK for Python
+# Copyright (c) 2019 VMware, Inc. All Rights Reserved.
+
+# SPDX-License-Identifier: Apache-2.0
+
 import json
 import logging
 import os
-
 import requests
 
 logging.basicConfig(level=os.getenv('caspyr_log_level'),
-                    format='%(asctime)s %(name)s %(levelname)s %(message)s'
+                    format='%(asctime)s %(name)s %(levelname)s %(message)s',
+                    filename=os.getenv('caspyr_log_file')
                     )
 logger = logging.getLogger(__name__)
 logging.getLogger('requests').setLevel(logging.CRITICAL)
@@ -22,7 +27,8 @@ class Session(object):
     def __init__(self, auth_token):
         self.token = auth_token
         self.headers = {'Content-Type': 'application/json',
-                        'csp-auth-token': self.token}
+                        'csp-auth-token': self.token,
+                        'Authorization': f'Bearer {self.token}'}
         self.baseurl = 'https://api.mgmt.cloud.vmware.com'
 
     @classmethod
@@ -31,16 +37,17 @@ class Session(object):
             uri = f'/auth/api-tokens/authorize?refresh_token={refresh_token}'
             headers = {'Content-Type': 'application/json'}
             payload = {}
-            logger.debug(f'POST to: {baseurl}{uri} '
-                         f'with headers: {headers} '
-                         f'and body: {payload}.'
+            logger.debug(f'POST to: {baseurl}{uri} \n'
+                         f'with headers: {headers} \n'
+                         f'and body: {payload}.\n'
                          )
 
             try:
                 r = requests.post(f'{baseurl}{uri}',
                                   headers=headers,
                                   data=payload)
-                logger.debug(f'Response: {r.json()}')
+                logger.debug(f'Status code" {r.status_code} \n'
+                             f'Response: {r.json()} \n')
                 r.raise_for_status()
                 logger.info('Authenticated successfully.')
                 auth_token = r.json()['access_token']
@@ -81,7 +88,8 @@ class Session(object):
                              f'with headers {self.headers} '
                              f'and body {payload}.'
                              )
-                logger.debug(f'Request response: {r.json()}')
+                logger.debug(f'Request response: {r.json()} \n'
+                             f'Status code" {r.status_code} \n')
                 r.raise_for_status()
                 return r.json()
             except requests.exceptions.HTTPError:
@@ -94,14 +102,16 @@ class Session(object):
                 r = requests.request(request_method,
                                      url=url,
                                      headers=self.headers)
-                logger.debug(f'{request_method} to {url} '
-                             f'with headers {self.headers}.'
+                logger.debug(f'{request_method} to {url} \n'
+                             f'with headers {self.headers} \n'
+                             f'Status code" {r.status_code} \n'
                              )
                 logger.debug(f'Request response: {r.json()}')
                 r.raise_for_status()
                 return r.json()
             except requests.exceptions.HTTPError:
-                logger.error(r.json()['message'],
+                pass
+                logger.error(r.json(),
                              exc_info=False
                              )
 
@@ -110,8 +120,9 @@ class Session(object):
                 r = requests.request(request_method,
                                      url=url,
                                      headers=self.headers)
-                logger.debug(f'{request_method} to {url} '
-                             f'with headers {self.headers}.'
+                logger.debug(f'{request_method} to {url} \n'
+                             f'with headers {self.headers} \n'
+                             f'Status code" {r.status_code} \n'
                              )
                 r.raise_for_status()
                 return r.status_code

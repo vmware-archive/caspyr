@@ -1,3 +1,8 @@
+# Cloud Automation Services SDK for Python
+# Copyright (c) 2019 VMware, Inc. All Rights Reserved.
+
+# SPDX-License-Identifier: Apache-2.0
+
 from abc import ABCMeta, abstractmethod
 
 
@@ -72,7 +77,7 @@ class Base(metaclass=ABCMeta):
     @staticmethod
     @abstractmethod
     def update(session, id, payload):
-        uri = f'/iaas/cloud-accounts/{id}'
+        uri = f'/iaas/api/cloud-accounts/{id}'
         return session._request(url=f'{session.baseurl}{uri}',
                                 request_method='PATCH',
                                 payload=payload
@@ -88,17 +93,17 @@ class CloudAccount(Base):
 
     @classmethod
     def list(cls, session):
-        uri = '/iaas/cloud-accounts'
+        uri = '/iaas/api/cloud-accounts'
         return super().list(session, uri)
 
     @classmethod
     def describe(cls, session, id):
-        uri = f'/iaas/cloud-accounts/{id}'
+        uri = f'/iaas/api/cloud-accounts/{id}'
         return cls(super().describe(session, uri))
 
     @classmethod
     def unregister(cls, session, id):
-        uri = f'/iaas/cloud-accounts/{id}'
+        uri = f'/iaas/api/cloud-accounts/{id}'
         return super().unregister(session, uri)
 
     @classmethod
@@ -120,17 +125,17 @@ class CloudAccountAws(Base):
 
     @classmethod
     def list(cls, session):
-        uri = '/iaas/cloud-accounts-aws'
+        uri = '/iaas/api/cloud-accounts-aws'
         return super().list(session, uri)['content']
 
     @classmethod
     def describe(cls, session, id):
-        uri = f'/iaas/cloud-accounts-aws/{id}'
+        uri = f'/iaas/api/cloud-accounts-aws/{id}'
         return cls(super().describe(session, uri))
 
     @classmethod
     def unregister(cls, session, id):
-        uri = f'/iaas/cloud-accounts-aws/{id}'
+        uri = f'/iaas/api/cloud-accounts-aws/{id}'
         return super().unregister(session, uri)
 
     @classmethod
@@ -148,7 +153,7 @@ class CloudAccountAws(Base):
                create_zone=False,
                description=None
                ):
-        uri = '/iaas/cloud-accounts-aws'
+        uri = '/iaas/api/cloud-accounts-aws'
         payload = {
             "name": name,
             "description": description,
@@ -164,17 +169,17 @@ class CloudAccountAzure(Base):
 
     @classmethod
     def list(cls, session):
-        uri = '/iaas/cloud-accounts-azure'
+        uri = '/iaas/api/cloud-accounts-azure'
         return super().list(session, uri)['content']
 
     @classmethod
     def describe(cls, session, id):
-        uri = f'/iaas/cloud-accounts-azure/{id}'
+        uri = f'/iaas/api/cloud-accounts-azure/{id}'
         return cls(super().describe(session, uri))
 
     @classmethod
     def unregister(cls, session, id):
-        uri = f'/iaas/cloud-accounts-azure/{id}'
+        uri = f'/iaas/api/cloud-accounts-azure/{id}'
         return super().unregister(session, uri)
 
     @classmethod
@@ -204,7 +209,7 @@ class CloudAccountAzure(Base):
             "regionIds": [regions],
             "createDefaultZones": create_zone
         }
-        uri = '/iaas/cloud-accounts-azure'
+        uri = '/iaas/api/cloud-accounts-azure'
         return cls(super().create(session, uri=uri, payload=payload))
 
 
@@ -212,17 +217,17 @@ class CloudAccountvSphere(Base):
 
     @classmethod
     def list(cls, session):
-        uri = '/iaas/cloud-accounts-vsphere'
+        uri = '/iaas/api/cloud-accounts-vsphere'
         return super().list(session, uri)
 
     @classmethod
     def describe(cls, session, id):
-        uri = f'/iaas/cloud-accounts-vsphere/{id}'
+        uri = f'/iaas/api/cloud-accounts-vsphere/{id}'
         return super().describe(session, uri)
 
     @classmethod
     def unregister(cls, session, id):
-        uri = f'/iaas/cloud-accounts-vsphere/{id}'
+        uri = f'/iaas/api/cloud-accounts-vsphere/{id}'
         return super().unregister(session, uri)
 
     @classmethod
@@ -266,7 +271,7 @@ class CloudAccountvSphere(Base):
         :rtype: [type]
         """
 
-        uri = '/iaas/cloud-accounts-vsphere'
+        uri = '/iaas/api/cloud-accounts-vsphere'
         payload = {
             "name": name,
             "description": description,
@@ -286,17 +291,17 @@ class CloudAccountNSXT(Base):
 
     @classmethod
     def list(cls, session):
-        uri = '/iaas/cloud-accounts-nsx-t'
+        uri = '/iaas/api/cloud-accounts-nsx-t'
         return super().list(session, uri)['content']
 
     @staticmethod
     def describe(session, id):
-        uri = f'/iaas/cloud-accounts-nsx-t/{id}'
+        uri = f'/iaas/api/cloud-accounts-nsx-t/{id}'
         return super().describe(session, uri)
 
     @classmethod
     def unregister(cls, session, id):
-        uri = f'/iaas/cloud-accounts-nsx-t/{id}'
+        uri = f'/iaas/api/cloud-accounts-nsx-t/{id}'
         return super().unregister(session, uri)
 
     @classmethod
@@ -314,7 +319,7 @@ class CloudAccountNSXT(Base):
                password,
                description=None
                ):
-        uri = '/iaas/cloud-accounts-nsx-t/'
+        uri = '/iaas/api/cloud-accounts-nsx-t/'
         payload = {
             "name": name,
             "description": description,

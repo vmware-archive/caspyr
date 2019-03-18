@@ -1,3 +1,9 @@
+# Cloud Automation Services SDK for Python
+# Copyright (c) 2019 VMware, Inc. All Rights Reserved.
+
+# SPDX-License-Identifier: Apache-2.0
+
+
 import os
 
 
@@ -24,7 +30,7 @@ class CloudZone(object):
     @staticmethod
     def list(session):
         """Takes a single input of your session bearer token"""
-        uri = '/iaas/zones/'
+        uri = '/iaas/api/zones/'
         j = session._request(f'{session.baseurl}{uri}')
         return j['content']
 
@@ -33,7 +39,7 @@ class CloudZone(object):
                  session,
                  id
                  ):
-        uri = f'/iaas/zones/{id}'
+        uri = f'/iaas/api/zones/{id}'
         return cls(session._request(f'{session.baseurl}{uri}'))
 
     @classmethod
@@ -41,7 +47,7 @@ class CloudZone(object):
                          session,
                          name
                          ):
-        uri = f'/iaas/zones?$filter=(name eq \'{name}\')'
+        uri = f'/iaas/api/zones?$filter=(name eq \'{name}\')'
         return cls(session._request(f'{session.baseurl}{uri}')['content'][0])
 
     @classmethod
@@ -54,7 +60,7 @@ class CloudZone(object):
                tags_to_match=[],
                description=''
                ):
-        uri = '/iaas/zones/'
+        uri = '/iaas/api/zones/'
         payload = {
             "name": name,
             "description": description,
@@ -70,7 +76,7 @@ class CloudZone(object):
 
     @staticmethod
     def delete(session, id):
-        uri = f'/iaas/zones/{id}'
+        uri = f'/iaas/api/zones/{id}'
         return session._request(f'{session.baseurl}{uri}',
                                 request_method='DELETE'
                                 )

@@ -1,3 +1,8 @@
+# Cloud Automation Services SDK for Python
+# Copyright (c) 2019 VMware, Inc. All Rights Reserved.
+
+# SPDX-License-Identifier: Apache-2.0
+
 """
 The Fabric module contains all the classes and methods required to get the
 underlying information for creating Image Mappings, Flavor Mappings, Network
@@ -35,7 +40,7 @@ class Image(object):
         :rtype: Image
         """
 
-        uri = f'/iaas/fabric-images?$filter=(name eq \'{image}\') and (externalRegionId eq \'{region}\')'
+        uri = f'/iaas/api/fabric-images?$filter=(name eq \'{image}\') and (externalRegionId eq \'{region}\')'
 
         j = session._request(f'{session.baseurl}{uri}')['content'][0]
         return cls(j)
@@ -68,7 +73,7 @@ class AzureStorageAccount(object):
         :type session: Session
         :return: Returns a list of storage accounts.
         """
-        uri = f'/iaas/fabric-azure-storage-account'
+        uri = f'/iaas/api/fabric-azure-storage-account'
         return session._request(f'{session.baseurl}{uri}')['content']
 
     @classmethod
@@ -119,23 +124,23 @@ class NetworkFabric(object):
         :return: [description]
         :rtype: [type]
         """
-        uri = f'/iaas/fabric-networks'
+        uri = f'/iaas/api/fabric-networks'
         return session._request(f'{session.baseurl}{uri}')['content']
 
     @classmethod
     def list_by_region(cls, session, region="*"):
-        uri = f'/iaas/fabric-networks?$filter=externalRegionId eq {region}'
+        uri = f'/iaas/api/fabric-networks?$filter=externalRegionId eq {region}'
         return session._request(f'{session.baseurl}{uri}')['content']
 
     @classmethod
     def describe_by_name(cls, session, name, region="*"):
-        uri = (f'/iaas/fabric-networks?$filter=(name eq {name}) and '
+        uri = (f'/iaas/api/fabric-networks?$filter=(name eq {name}) and '
                '(externalRegionId eq {region})')
         return cls(session._request(f'{session.baseurl}{uri}')['content'])
 
     @classmethod
     def describe(cls, session, id):
-        uri = f'/iaas/fabric-networks/{id}'
+        uri = f'/iaas/api/fabric-networks/{id}'
         return cls(session._request(f'{session.baseurl}{uri}'))
 
     @classmethod
@@ -150,7 +155,7 @@ class NetworkFabric(object):
         :return: [description]
         :rtype: [type]
         """
-        uri = f'/iaas/fabric-network/{id}'
+        uri = f'/iaas/api/fabric-network/{id}'
         payload = {
             tags
         }
@@ -178,5 +183,5 @@ class Flavor(object):
 
     @staticmethod
     def describe(session):
-        uri = f'/iaas/fabric-flavors'
+        uri = f'/iaas/api/fabric-flavors'
         print(session._request(f'{session.baseurl}{uri}')['content'][0])

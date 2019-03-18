@@ -1,3 +1,9 @@
+# Cloud Automation Services SDK for Python
+# Copyright (c) 2019 VMware, Inc. All Rights Reserved.
+
+# SPDX-License-Identifier: Apache-2.0
+
+
 class Project(object):
     """
     Class for Project methods
@@ -27,12 +33,12 @@ class Project(object):
 
     @classmethod
     def list(cls, session):
-        uri = '/iaas/projects'
+        uri = '/iaas/api/projects'
         return session._request(f'{session.baseurl}{uri}')['content']
 
     @classmethod
     def describe(cls, session, id):
-        uri = f'/iaas/projects/{id}'
+        uri = f'/iaas/api/projects/{id}'
         return cls(session._request(f'{session.baseurl}{uri}'))
 
     @classmethod
@@ -45,7 +51,7 @@ class Project(object):
 
     @staticmethod
     def delete(session, id):
-        uri = f'/iaas/projects/{id}'
+        uri = f'/iaas/api/projects/{id}'
         return session._request(f'{session.baseurl}{uri}',
                                 request_method='DELETE'
                                 )
@@ -55,7 +61,7 @@ class Project(object):
                     session,
                     id
                     ):
-        uri = f'/iaas/projects/{id}'
+        uri = f'/iaas/api/projects/{id}'
         payload = {}
         payload['zoneAssignmentConfigurations'] = []
         return cls(session._request(f'{session.baseurl}{uri}',
@@ -67,7 +73,7 @@ class Project(object):
     def removemembers(cls,
                       session,
                       id):
-        uri = f'/iaas/projects/{id}'
+        uri = f'/iaas/api/projects/{id}'
         payload = {}
         payload['members'] = []
         return cls(session._request(f'{session.baseurl}{uri}',
@@ -77,7 +83,7 @@ class Project(object):
 
     @classmethod
     def removeadmins(cls, session, id):
-        uri = f'/iaas/projects/{id}'
+        uri = f'/iaas/api/projects/{id}'
         payload = {}
         payload['administrators'] = []
         return cls(session._request(f'{session.baseurl}{uri}',
@@ -119,7 +125,7 @@ class Project(object):
         :rtype: [type]
         """
 
-        uri = '/iaas/projects/'
+        uri = '/iaas/api/projects/'
         payload = {
                 "name": name,
                 "description": description,

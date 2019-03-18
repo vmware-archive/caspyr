@@ -1,21 +1,26 @@
+# Cloud Automation Services SDK for Python
+# Copyright (c) 2019 VMware, Inc. All Rights Reserved.
+
+# SPDX-License-Identifier: Apache-2.0
+
 class Network(object):
     def __init__(self, network):
         pass
 
     @staticmethod
     def list(session):
-        uri = f'/iaas/networks'
+        uri = f'/iaas/api/networks'
         j = session._request(f'{session.baseurl}{uri}')
         return j['content']
 
     @classmethod
     def describe(cls, session, id):
-        uri = f'/iaas/networks/{id}'
+        uri = f'/iaas/api/networks/{id}'
         return cls(session._request(f'{session.baseurl}{uri}'))
 
     @staticmethod
     def delete(session, id):
-        uri = f'/iaas/networks/{id}'
+        uri = f'/iaas/api/networks/{id}'
         return session._request(f'{session.baseurl}{uri}',
                                 request_method='DELETE'
                                 )
@@ -27,13 +32,13 @@ class Machine(object):
 
     @staticmethod
     def list(session):
-        uri = f'/iaas/machines'
+        uri = f'/iaas/api/machines'
         j = session._request(f'{session.baseurl}{uri}')
         return j['content']
 
     @classmethod
     def describe(cls, session, id):
-        uri = f'/iaas/machines/{id}'
+        uri = f'/iaas/api/machines/{id}'
         return session._request(f'{session.baseurl}{uri}')
 
     @staticmethod
@@ -66,14 +71,14 @@ class Machine(object):
 
     @staticmethod
     def delete(session, id):
-        uri = f'/iaas/machines/{id}'
+        uri = f'/iaas/api/machines/{id}'
         session._request(f'{session.baseurl}{uri}',
                          request_method='DELETE'
                          )
 
     @staticmethod
     def find_by_user(session, user):
-        uri = (f"/iaas/machines?$filter=(((type eq 'VM_GUEST') and "
+        uri = (f"/iaas/api/machines?$filter=(((type eq 'VM_GUEST') and "
                f"(lifecycleState ne 'RETIRED')) and "
                f"(tenantLinks.item eq "
                f"'/owner/provisioning/auth/csp/users/{user}'))"
@@ -87,7 +92,7 @@ class Machine(object):
 
     @staticmethod
     def unregister(session, uri):
-        uri = f'/provisioning/uerp{uri}'
+        uri = f'/provisioning/uerp/{uri}'
         payload = session._request(f'{session.baseurl}{uri}')
         payload['customProperties']['__groupResourcePlacementLink'] = ""
         return session._request(f'{session.baseurl}{uri}',

@@ -1,3 +1,9 @@
+# Cloud Automation Services SDK for Python
+# Copyright (c) 2019 VMware, Inc. All Rights Reserved.
+
+# SPDX-License-Identifier: Apache-2.0
+
+
 class Region(object):
     """
     Class for Region methods.
@@ -14,16 +20,16 @@ class Region(object):
 
     @staticmethod
     def list(session):
-        uri = f'/iaas/regions'
+        uri = f'/iaas/api/regions'
         j = session._request(f'{session.baseurl}{uri}')
         return j['content']
 
     @classmethod
     def describe(cls, session, id):
-        uri = f'/iaas/regions/{id}'
+        uri = f'/iaas/api/regions/{id}'
         return cls(session._request(f'{session.baseurl}{uri}'))
 
     def describe_by_name(self, session, name):
-        uri = f'/iaas/regions/?$filter=(externalRegionId eq \'{name}\')'
+        uri = f'/iaas/api/regions/?$filter=(externalRegionId eq \'{name}\')'
         j = session._request(f'{session.baseurl}{uri}')
         return j
