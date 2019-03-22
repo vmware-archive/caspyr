@@ -57,7 +57,6 @@ class Blueprint:
         """
 
         uri = '/blueprint/api/blueprints/'
-        data = []
         j = session._request(f'{session.baseurl}{uri}')
         return j['objects']
 
