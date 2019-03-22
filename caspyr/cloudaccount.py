@@ -1,3 +1,8 @@
+# Cloud Automation Services SDK for Python
+# Copyright (c) 2019 VMware, Inc. All Rights Reserved.
+
+# SPDX-License-Identifier: Apache-2.0
+
 from abc import ABCMeta, abstractmethod
 
 
@@ -13,7 +18,10 @@ class Base(metaclass=ABCMeta):
         self.organization = cloudaccount['organizationId']
         self._links = cloudaccount['_links']
         self.custom_properties = cloudaccount['customProperties']
-        self.cloud_account_properties = cloudaccount['cloudAccountProperties']
+        try:
+            self.cloud_account_properties = cloudaccount['cloudAccountProperties']
+        except KeyError:
+            pass
         try:
             self.type = cloudaccount['type']
         except KeyError:
@@ -37,7 +45,7 @@ class Base(metaclass=ABCMeta):
         """
         Returns the detail of a cloud account.
         """
-        return (session._request(url=f'{session.baseurl}{uri}'))
+        return session._request(url=f'{session.baseurl}{uri}')
 
     @classmethod
     @abstractmethod
@@ -110,6 +118,10 @@ class CloudAccount(Base):
     def create(cls):
         pass
 
+    @classmethod
+    def update(cls):
+        pass
+
 
 class CloudAccountAws(Base):
     """
@@ -159,6 +171,10 @@ class CloudAccountAws(Base):
         }
         return cls(super().create(session, uri=uri, payload=payload))
 
+    @classmethod
+    def update(cls):
+        pass
+
 
 class CloudAccountAzure(Base):
 
@@ -206,6 +222,10 @@ class CloudAccountAzure(Base):
         }
         uri = '/iaas/cloud-accounts-azure'
         return cls(super().create(session, uri=uri, payload=payload))
+
+    @classmethod
+    def update(cls):
+        pass
 
 
 class CloudAccountvSphere(Base):
@@ -281,6 +301,10 @@ class CloudAccountvSphere(Base):
             }
         return cls(super().create(session, uri=uri, payload=payload))
 
+    @classmethod
+    def update(cls):
+        pass
+
 
 class CloudAccountNSXT(Base):
 
@@ -325,3 +349,7 @@ class CloudAccountNSXT(Base):
             "password": password
             }
         return cls(super().create(session, uri=uri, payload=payload))
+
+    @classmethod
+    def update(cls):
+        pass
