@@ -95,18 +95,6 @@ class Blueprint:
         return session._request(f'{session.baseurl}{uri}')
 
     @classmethod
-    def create_from_json(cls,
-                         session,
-                         jsonfile
-                         ):
-        payload = open(jsonfile).read()
-        uri = f'/blueprint/api/blueprints'
-        return cls(session._request(f'{session.baseurl}{uri}',
-                                    request_method='POST',
-                                    payload=payload
-                                    ))
-
-    @classmethod
     def create(cls,
                session,
                project_id,
@@ -115,9 +103,27 @@ class Blueprint:
                version,
                content
                ):
+        """Creates a blueprint from a valid YAML input.
 
+        :param session: The session object.
+        :type session: object
+        :param project_id: The unique ID of the project in which to place
+        this blueprint.
+        :type project_id: str
+        :param bp_name: The name of the blueprint.
+        :type bp_name: str
+        :param description: A description of what the blueprint is/does.
+        :type description: str
+        :param version: The version of the blueprint you are passing.
+        :type version: str
+        :param content: Valid blueprint YAML, should be enclosed in double
+        quotes.
+        :type content: str
+        :return: blueprint
+        :rtype: object
+        """
         # pylint: disable=too-many-arguments
-        # require these arguments to create a bueprint
+        # require these arguments to create a blueprint
 
         uri = '/blueprint/api/blueprints'
         payload = {
@@ -138,24 +144,53 @@ class Blueprint:
 
     @staticmethod
     def list_provider_resources(session):
+        """Returns a list of provider types.
+
+        :param session: The session object.
+        :type session: obj
+        :return: A list of provider types and metadata.
+        :rtype: list
+        """
+
         uri = '/blueprint/api/provider-resources'
+        return session._request(f'{session.baseurl}{uri}')['objects']
+
+    @staticmethod
+    def describe_provider_resources(session, provider_resource_id):
+        """Returns the detailed schema of a given provider resource.
+
+        :param session: The session object.
+        :type session: obj
+        :param provider_resource_id: The unique id of the provider resource
+        you want to query.
+        :type provider_resource_id: str
+        :return: Returns the schema of the provider resource as a json object.
+        :rtype: obj
+        """
+
+        uri = f'/blueprint/api/provider-resources/{provider_resource_id}'
         return session._request(f'{session.baseurl}{uri}')
 
     @staticmethod
-    def describe_provider_resources(session, id):
-        uri = f'/blueprint/api/provider-resources/{id}'
-        return session._request(f'{session.baseurl}{uri}')
+    def delete(session, blueprint_id):
+        """Deletes a blueprint from the system.
 
-    @staticmethod
-    def delete(session, id):
-        uri = f'/blueprint/api/blueprints/{id}'
+        :param session: The session object.
+        :type session: object
+        :param blueprint_id: The unique blueprint id.
+        :type blueprint_id: str
+        :return: Returns the HTTP status code.
+        :rtype: int
+        """
+
+        uri = f'/blueprint/api/blueprints/{blueprint_id}'
         return session._request(f'{session.baseurl}{uri}',
                                 request_method='DELETE'
                                 )
 
     @staticmethod
     def request(session,
-                id,
+                blueprint_id,
                 deployment_name,
                 project_id,
                 blueprint_version=None,
@@ -166,6 +201,41 @@ class Blueprint:
                 plan=False,
                 destroy=False
                 ):
+        """Requests a blueprint through Cloud Assembly.
+
+        :param session: The session object.
+        :type session: object
+        :param blueprint_id: The unique id of the blueprint to request.
+        :type blueprint_id: str
+        :param deployment_name: The name of the resulting deployment from the
+        blueprint request.
+        :type deployment_name: str
+        :param project_id: The unique project id that you are making the
+        request from.
+        :type project_id: str
+        :param blueprint_version: The version of the blueprint to request,
+        defaults to None which uses the current draft.
+        :type blueprint_version: str, optional.
+        :param reason: The reason for the new request, defaults to None.
+        :type reason: str, optional.
+        :param description: A description for the deployment that will show on
+        the deployments page, defaults to None.
+        :type description: str, optional.
+        :param deployment_id: The unique id of the deployment to iterate on.
+        Only used when updating an existing deployment, defaults to None.
+        :type deployment_id: str, optional.
+        :param inputs: Input values to pass as part of the request, defaults
+        to None.
+        :type inputs: obj, optional.
+        :param plan: Simulate the request and check what resources will be
+        created, modified or deleted. Defaults to False.
+        :type plan: bool, optional
+        :param destroy: Used to destroy an existing deployment, defaults to
+        False.
+        :type destroy: bool, optional.
+        :return: blueprint
+        :rtype: obj
+        """
 
         # pylint: disable=too-many-arguments
         # require these arguments to submit a blueprint request
@@ -179,7 +249,7 @@ class Blueprint:
             "projectId": project_id,
             "plan": plan,
             "destroy": destroy,
-            "blueprintId": id,
+            "blueprintId": blueprint_id,
             "blueprintVersion": blueprint_version,
             "inputs": inputs
         }
