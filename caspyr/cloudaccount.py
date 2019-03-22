@@ -34,24 +34,21 @@ class Base(metaclass=ABCMeta):
     @classmethod
     @abstractmethod
     def list(self, session, uri):
-        """
-        Returns a list of account ids.
+        """ Returns a list of account ids.
         """
         return (session._request(url=f'{session.baseurl}{uri}'))['content']
 
     @classmethod
     @abstractmethod
     def describe(cls, session, uri):
-        """
-        Returns the detail of a cloud account.
+        """ Returns the detail of a cloud account.
         """
         return session._request(url=f'{session.baseurl}{uri}')
 
     @classmethod
     @abstractmethod
     def create(cls, session, uri, payload):
-        """
-        Creates a Cloud Account.
+        """ Creates a Cloud Account.
         """
         return session._request(url=f'{session.baseurl}{uri}',
                                 request_method='POST',
@@ -61,18 +58,17 @@ class Base(metaclass=ABCMeta):
     @classmethod
     @abstractmethod
     def unregister(cls, session, uri):
-        """
-        Removes the cloud account from cloud assembly only,
+        """ Removes the cloud account from Cloud Assembly only,
         leaves it registered in discovery.
         """
+
         return session._request(url=f'{session.baseurl}{uri}',
                                 request_method='DELETE')
 
     @staticmethod
     @abstractmethod
     def delete(session, uri):
-        """
-        Removes the cloud account from discovery, and all other services.
+        """ Removes the Cloud Account from discovery, and all other services.
         """
         return session._request(url=f'{session.baseurl}{uri}',
                                 request_method='DELETE')
@@ -100,18 +96,18 @@ class CloudAccount(Base):
         return super().list(session, uri)
 
     @classmethod
-    def describe(cls, session, id):
-        uri = f'/iaas/cloud-accounts/{id}'
+    def describe(cls, session, cloud_account_id):
+        uri = f'/iaas/cloud-accounts/{cloud_account_id}'
         return cls(super().describe(session, uri))
 
     @classmethod
-    def unregister(cls, session, id):
-        uri = f'/iaas/cloud-accounts/{id}'
+    def unregister(cls, session, cloud_account_id):
+        uri = f'/iaas/cloud-accounts/{cloud_account_id}'
         return super().unregister(session, uri)
 
     @classmethod
-    def delete(cls, session, id):
-        uri = f'/api/cloud-accounts/{id}'
+    def delete(cls, session, cloud_account_id):
+        uri = f'/api/cloud-accounts/{cloud_account_id}'
         return super().delete(session, uri)
 
     @classmethod
@@ -136,18 +132,18 @@ class CloudAccountAws(Base):
         return super().list(session, uri)['content']
 
     @classmethod
-    def describe(cls, session, id):
-        uri = f'/iaas/cloud-accounts-aws/{id}'
+    def describe(cls, session, cloud_account_id):
+        uri = f'/iaas/cloud-accounts-aws/{cloud_account_id}'
         return cls(super().describe(session, uri))
 
     @classmethod
-    def unregister(cls, session, id):
-        uri = f'/iaas/cloud-accounts-aws/{id}'
+    def unregister(cls, session, cloud_account_id):
+        uri = f'/iaas/cloud-accounts-aws/{cloud_account_id}'
         return super().unregister(session, uri)
 
     @classmethod
-    def delete(cls, session, id):
-        uri = f'/api/cloud-accounts/{id}'
+    def delete(cls, session, cloud_account_id):
+        uri = f'/api/cloud-accounts/{cloud_account_id}'
         return super().delete(session, uri)
 
     @classmethod
@@ -184,18 +180,18 @@ class CloudAccountAzure(Base):
         return super().list(session, uri)['content']
 
     @classmethod
-    def describe(cls, session, id):
-        uri = f'/iaas/cloud-accounts-azure/{id}'
+    def describe(cls, session, cloud_account_id):
+        uri = f'/iaas/cloud-accounts-azure/{cloud_account_id}'
         return cls(super().describe(session, uri))
 
     @classmethod
-    def unregister(cls, session, id):
-        uri = f'/iaas/cloud-accounts-azure/{id}'
+    def unregister(cls, session, cloud_account_id):
+        uri = f'/iaas/cloud-accounts-azure/{cloud_account_id}'
         return super().unregister(session, uri)
 
     @classmethod
-    def delete(cls, session, id):
-        uri = f'/api/cloud-accounts/{id}'
+    def delete(cls, session, cloud_account_id):
+        uri = f'/api/cloud-accounts/{cloud_account_id}'
         return super().delete(session, uri)
 
     @classmethod
@@ -236,18 +232,18 @@ class CloudAccountvSphere(Base):
         return super().list(session, uri)
 
     @classmethod
-    def describe(cls, session, id):
-        uri = f'/iaas/cloud-accounts-vsphere/{id}'
+    def describe(cls, session, cloud_account_id):
+        uri = f'/iaas/cloud-accounts-vsphere/{cloud_account_id}'
         return super().describe(session, uri)
 
     @classmethod
-    def unregister(cls, session, id):
-        uri = f'/iaas/cloud-accounts-vsphere/{id}'
+    def unregister(cls, session, cloud_account_id):
+        uri = f'/iaas/cloud-accounts-vsphere/{cloud_account_id}'
         return super().unregister(session, uri)
 
     @classmethod
-    def delete(cls, session, id):
-        uri = f'/api/cloud-accounts/{id}'
+    def delete(cls, session, cloud_account_id):
+        uri = f'/api/cloud-accounts/{cloud_account_id}'
         return super().delete(session, uri)
 
     @classmethod
@@ -314,18 +310,18 @@ class CloudAccountNSXT(Base):
         return super().list(session, uri)['content']
 
     @staticmethod
-    def describe(session, id):
-        uri = f'/iaas/cloud-accounts-nsx-t/{id}'
+    def describe(session, cloud_account_id):
+        uri = f'/iaas/cloud-accounts-nsx-t/{cloud_account_id}'
         return super().describe(session, uri)
 
     @classmethod
-    def unregister(cls, session, id):
-        uri = f'/iaas/cloud-accounts-nsx-t/{id}'
+    def unregister(cls, session, cloud_account_id):
+        uri = f'/iaas/cloud-accounts-nsx-t/{cloud_account_id}'
         return super().unregister(session, uri)
 
     @classmethod
-    def delete(cls, session, id):
-        uri = f'/api/cloud-accounts/{id}'
+    def delete(cls, session, cloud_account_id):
+        uri = f'/api/cloud-accounts/{cloud_account_id}'
         return super().delete(session, uri)
 
     @classmethod
