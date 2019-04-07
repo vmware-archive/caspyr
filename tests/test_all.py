@@ -2,7 +2,6 @@ import unittest
 import os
 from requests import HTTPError
 import json
-import yaml
 
 
 class Session_tests(unittest.TestCase):
