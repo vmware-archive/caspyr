@@ -16,6 +16,9 @@ jobs:
     steps:
       - checkout
       - run:
+          name: set api_key environment variable
+          command: export api_token=${api_token}
+      - run:
           name: install dependencies
           command: |
             python3 -m venv venv
