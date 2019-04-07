@@ -41,7 +41,7 @@ jobs:
             . venv/bin/activate
             export api_token=${api_token}
             echo $api_token
-            python3 -m unittest discover -v -t ./tests
+            python3 -m unittest discover -v
 
       - store_artifacts:
           path: test-reports
