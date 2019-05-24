@@ -4,9 +4,17 @@ This is a set of Python (3.6 minimum version) bindings for VMware Cloud Automati
 
 ![](CaspyrDemo.gif)
 
-The initial use case was designed to automate the 1902-03 Hands On Labs for VMworld; but significant use case exist to consume this SDK.
+These bindings simplify the utilization of many of the common endpoints within the CAS API. Some of these common endpoints include...
 
-This kit was primarily designed by VMware employees however is not a VMware project as of now.
+* Blueprints
+* Projects
+* Deployments
+* Machines
+* Pipelines
+* Network Profiles
+* Cloud Accounts/Zones
+
+Currently this SDK is used for the VMware Hands on Labs as well as internal Marketing and Training environments to automate the full deployment and configuration of CAS environments.
 
 ## Requirements for Usage
 
