@@ -2,7 +2,7 @@
 
 This is a set of Python (3.6 minimum version) bindings for VMware Cloud Automation Services (Cloud Assembly, Service Broker, Code Stream) meant to simplify programmatic consumption of it's API interfaces.
 
-![](DeploymentListDemo.gif)
+![](CaspyrDemo.gif)
 
 The initial use case was designed to automate the 1902-03 Hands On Labs for VMworld; but significant use case exist to consume this SDK.
 
