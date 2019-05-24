@@ -58,5 +58,6 @@ Documentation is forthcoming (PR's welcome!)
 
 ## Maintainers
 
-Grant Orchard (@grantorchard)
-Cody De Arkland (@codydearkland)
+Grant Orchard ([@grantorchard](https://twitter.com/grantorchard))
+<br>
+Cody De Arkland ([@codydearkland](https://twitter.com/codydearkland))
