@@ -19,7 +19,7 @@ This kit was primarily designed by VMware employees however is not a VMware proj
 Clone this repository and install leveraging the setup.py file.
 
 ```bash
-python setup.py install
+python3 setup.py install
 ```
 
 Once installation is complete, Import the appropriate modules/libraries in order to begin interacting with the platform. Example import statement is below
