@@ -24,13 +24,14 @@ class Integration:
         :return: A list of resource endpoints.
         :rtype: list
         """
-        uri = '/provisioning/uerp/resources/endpoints?expand'
+        uri = '/provisioning/uerp/resources/endpoints'
         j = session._request(f'{session.baseurl}{uri}')
         endpoints = []
         for i in j['documentLinks']:
             obj = {}
             q = session._request(f'{session.baseurl}/provisioning/uerp/provisioning/mgmt/endpoints{i}')
             obj['name'] = q['name']
+            obj['resourceLink'] = i
             obj['id'] = q['id']
             obj['endpointType'] = q['endpointType']
             endpoints.append(obj)
