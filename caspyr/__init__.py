@@ -31,3 +31,5 @@ from .codestream import CodeStream
 from .user import User
 from .iaas import Machine, Network
 from .datacollector import DataCollector
+from .extensibility import Subscription,Action
+from .integration import Source,Integration
