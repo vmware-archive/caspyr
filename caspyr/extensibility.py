@@ -8,7 +8,7 @@ class Subscription:
     Class for methods related to Event Broker Subscriptions.
     :method list: Returns an array of all subscriptions that are
     flagged as runnable.
-    :method describe: Returns the full schema of the associatd
+    :method describe: Returns the full schema of the associated
     subscription.
     :method delete: Deletes the subscription.
     """
@@ -53,6 +53,7 @@ class Subscription:
         return session._request(f'{session.baseurl}{uri}')
 
     @staticmethod
+    def delete(session, id):
         """Deletes an Event Broker subscription based on a supplied
         id.
 
@@ -63,7 +64,6 @@ class Subscription:
         :return: Success/Failure.
         :rtype: status code
         """
-    def delete(session, id):
         uri = f'/event-broker/api/subscriptions/{id}'
         return session._request(f'{session.baseurl}{uri}',
                             request_method='DELETE'
