@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/vmware/caspyr.svg?style=svg)](https://circleci.com/gh/vmware/caspyr)
+[![CircleCI](https://circleci.com/gh/vmware/caspyr.svg?style=svg&circle-token=:status-token)](https://circleci.com/gh/vmware/caspyr)
 
 # Cloud Automation Services SDK for Python (Caspyr)
 
