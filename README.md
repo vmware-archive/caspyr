@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/vmware/caspyr.svg?style=svg)](https://circleci.com/gh/vmware/caspyr)
+
 # Cloud Automation Services SDK for Python (Caspyr)
 
 This is a set of Python (3.6 minimum version) bindings for VMware Cloud Automation Services (Cloud Assembly, Service Broker, Code Stream) meant to simplify programmatic consumption of it's API interfaces.
