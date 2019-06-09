@@ -28,8 +28,16 @@ class CodeStream(object):
 
     @staticmethod
     def pipeline_list(session):
-        pass
-
+        uri = '/pipeline/api/pipelines'
+        r = session._request(f'{session.baseurl}{uri}')['links']
+        jsonData = []
+        for i in r: 
+            entry = {}
+            entry['selflink'] = i
+            entry['name'] = session._request(f'{session.baseurl}{i}')['name']
+            jsonData.append(entry)
+        return jsonData
+       
     @staticmethod
     def pipeline_delete(session, id):
         pass
