@@ -33,7 +33,7 @@ class Session_tests(unittest.TestCase):
         self.assertEqual(self.session.baseurl,
                          'https://api.mgmt.cloud.vmware.com'
                          )
-        self.assertTrue(self.session.headers['csp-auth-token'])
+        self.assertTrue(self.session.headers['Authorization'])
 
     def test_02_exception_raised_on_failed_login(self):
         '''
