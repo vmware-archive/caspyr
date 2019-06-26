@@ -14,7 +14,10 @@ class Base(metaclass=ABCMeta):
     def __init__(self, cloudaccount):
         self.id = cloudaccount['id']
         self.name = cloudaccount['name']
-        self.enabled_region_ids = cloudaccount['enabledRegionIds']
+        try:
+            self.enabled_region_ids = cloudaccount['enabledRegionIds']
+        except KeyError:
+            pass
         self.organization = cloudaccount['organizationId']
         self._links = cloudaccount['_links']
         self.custom_properties = cloudaccount['customProperties']
@@ -34,7 +37,7 @@ class Base(metaclass=ABCMeta):
     @classmethod
     @abstractmethod
     def list(self, session, uri):
-        """ Returns a list of account ids.
+        """ Returns a list of cloud account ids.
         """
         return (session._request(url=f'{session.baseurl}{uri}'))['content']
 
