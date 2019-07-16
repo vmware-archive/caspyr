@@ -27,7 +27,8 @@ class Session(object):
     def __init__(self, auth_token):
         self.token = auth_token
         self.headers = {'Content-Type': 'application/json',
-                        'Authorization': f'Bearer {self.token}'}
+                        'Authorization': f'Bearer {self.token}',
+			'csp-auth-token': f'{self.token}'}
         self.baseurl = 'https://api.mgmt.cloud.vmware.com'
 
     @classmethod
