@@ -95,3 +95,38 @@ class Source:
                                 request_method='DELETE'
                                 )
 
+class CatalogSource:
+    def __init__(self, source):
+        self.name = source['name']
+        self.id = source['name']
+
+    @staticmethod
+    def list(session):
+        """Retrieves list of all integration source within a
+        Organization
+
+        :param session: The session object.
+        :type session: object
+        :return: A list of sources.
+        :rtype: list
+        """
+        uri = '/catalog/api/admin/sources/'
+        j = session._request(f'{session.baseurl}{uri}')
+        return j['content']
+
+    @staticmethod
+    def delete(session,id):
+        """Deletes source based on a supplied id.
+
+        :param session: The session object.
+        :type session: object
+        :param id: The ID of an integration source
+        :type id: string
+        :return: Success/Failure.
+        :rtype: status code
+        """
+        uri = f'/catalog/api/admin/sources/{id}'
+        return session._request(f'{session.baseurl}{uri}',
+                                request_method='DELETE'
+                                )    
+

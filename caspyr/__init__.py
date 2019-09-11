@@ -32,4 +32,4 @@ from .user import User
 from .iaas import Machine, Network
 from .datacollector import DataCollector
 from .extensibility import Subscription,Action
-from .integration import Source,Integration
+from .integration import Source,Integration,CatalogSource
