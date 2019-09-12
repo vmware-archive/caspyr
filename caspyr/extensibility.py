@@ -28,14 +28,9 @@ class Subscription:
         :return: A list of subscriptions.
         :rtype: list
         """
-        uri ='/event-broker/api/subscriptions/'
+        uri =f"/event-broker/api/subscriptions?$filter=(type ne 'SUBSCRIBABLE')"
         j = session._request(f'{session.baseurl}{uri}')
-        subs = []
-        for i in j['content']: 
-            if i['type'] == 'RUNNABLE':
-                print(i['name'])
-                subs.append(i)
-        return subs
+        return j['content']
 
     @staticmethod
     def describe(session, id):
