@@ -27,7 +27,6 @@ class Blueprint:
     def __init__(self, blueprint):
         self.name = blueprint['name']
         self.description = blueprint['description']
-        self.tags = blueprint['tags']
         self.content = blueprint['content']
         self.valid = blueprint['valid']
         try:
@@ -37,7 +36,6 @@ class Blueprint:
         self.status = blueprint['status']
         self.project_id = blueprint['projectId']
         self.project_name = blueprint['projectName']
-        self.type = blueprint['type']
         self.id = blueprint['id']
         self.self_link = blueprint['selfLink']
         self.created_at = blueprint['createdAt']
@@ -58,7 +56,7 @@ class Blueprint:
 
         uri = '/blueprint/api/blueprints/'
         j = session._request(f'{session.baseurl}{uri}')
-        return j['objects']
+        return j['content']
 
     @classmethod
     def describe(cls, session, blueprint_id):
@@ -75,7 +73,7 @@ class Blueprint:
         """
 
         uri = f'/blueprint/api/blueprints/{blueprint_id}'
-        return cls(session._request(f'{session.baseurl}{uri}')[''])
+        return cls(session._request(f'{session.baseurl}{uri}'))
 
     @staticmethod
     def get_inputs(session, blueprint_id):
@@ -256,3 +254,80 @@ class Blueprint:
                                 request_method='POST',
                                 payload=payload
                                 )
+
+    @classmethod
+    def version(cls,
+                session,
+                blueprint_id,
+                version,
+                changelog=None,
+                description=None,
+                release=False):
+        """creates a new version of the specified blueprint
+        and creates a class object of it.
+
+        :param session: The session object.
+        :type session: object
+        :param blueprint_id: The id of the blueprint that you want the details
+        of.
+        :type blueprint_id: string
+        :param version: the new version of the blueprint.
+        :type version: string
+        :param changelog: Changelog for this version
+        :type changelog: string, optional
+        :param description: Description for this version
+        :type description: string, optional
+        :param release: Whether to release this version to the catalog
+        :type release: boolean, optional
+        :return: Returns the HTTP status code.
+        :rtype: int
+        """
+
+        uri = f'/blueprint/api/blueprints/{blueprint_id}/versions'
+        payload = {
+                   "changeLog": changelog,
+                   "description": description,
+                   "release": release,
+                   "version": version
+                   }
+        return session._request(f'{session.baseurl}{uri}',
+                                request_method='POST',
+                                payload=payload)
+
+    @classmethod
+    def release(cls, session, blueprint_id, version):
+        """Releases a version of the blueprint to the catalog
+
+        :param session: The session object.
+        :type session: object
+        :param blueprint_id: The id of the blueprint that you want the details
+        of.
+        :type blueprint_id: string
+        :param version: the new version of the blueprint.
+        :type version: string
+        :return: Returns the HTTP status code.
+        :rtype: int
+        """
+
+        uri = f'/blueprint/api/blueprints/{blueprint_id}/versions/{version}/actions/release'
+       
+        return session._request(f'{session.baseurl}{uri}')
+
+    @classmethod
+    def unrelease(cls, session, blueprint_id, version):
+        """Unreleases a version of the blueprint from the catalog.
+
+        :param session: The session object.
+        :type session: object
+        :param blueprint_id: The id of the blueprint that you want the details
+        of.
+        :type blueprint_id: string
+        :param version: the new version of the blueprint.
+        :type version: string
+        :return: Returns the HTTP status code.
+        :rtype: int
+        """
+
+        uri = f'/blueprint/api/blueprints/{blueprint_id}/versions/{version}/actions/unrelease'
+       
+        return session._request(f'{session.baseurl}{uri}')
