@@ -382,7 +382,8 @@ class Blueprint:
 
         uri = f'/blueprint/api/blueprints/{blueprint_id}/versions/{version}/actions/release'
        
-        return session._request(f'{session.baseurl}{uri}')
+        return session._request(f'{session.baseurl}{uri}',
+                                request_method='POST')
 
     @classmethod
     def unrelease(cls, session, blueprint_id, version):
@@ -401,4 +402,5 @@ class Blueprint:
 
         uri = f'/blueprint/api/blueprints/{blueprint_id}/versions/{version}/actions/unrelease'
        
-        return session._request(f'{session.baseurl}{uri}')
+        return session._request(f'{session.baseurl}{uri}',
+                                request_method='POST')
