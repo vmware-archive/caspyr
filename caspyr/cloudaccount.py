@@ -132,7 +132,7 @@ class CloudAccountAws(Base):
     @classmethod
     def list(cls, session):
         uri = '/iaas/cloud-accounts-aws'
-        return super().list(session, uri)['content']
+        return super().list(session, uri)#['content']
 
     @classmethod
     def describe(cls, session, cloud_account_id):
