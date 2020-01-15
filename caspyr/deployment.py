@@ -13,14 +13,14 @@ class Deployment(object):
         self.id = deployment['id']
         self.name = deployment['name']
         self.description = deployment['description']
-        self.blueprint_id = deployment['blueprintId']
-        # self.icon_link = deployment['iconLink']
+        self.template_link = deployment['templateLink']
+        self.icon_link = deployment['iconLink']
         self.created_at = deployment['createdAt']
         self.created_by = deployment['createdBy']
-        self.updated_at = deployment['lastUpdatedAt']
-        self.updated_by = deployment['lastUpdatedBy']
+        self.updated_at = deployment['updatedAt']
+        self.updated_by = deployment['updatedBy']
         self.inputs = deployment['inputs']
-        # self.resource_links = deployment['resourceLinks']
+        self.resource_links = deployment['resourceLinks']
 
     @staticmethod
     def list(session):
@@ -42,7 +42,7 @@ class Deployment(object):
     @classmethod
     def describe(cls, session, id):
         uri = f'/deployment/api/deployments/{id}'
-        return session._request(url=f'{session.baseurl}{uri}')
+        return cls(session._request(url=f'{session.baseurl}{uri}'))
 
     @staticmethod
     def list_by_project_id(session, id):
