@@ -13,7 +13,7 @@ class Deployment(object):
         self.id = deployment['id']
         self.name = deployment['name']
         self.description = deployment['description']
-        self.template_link = deployment['templateLink']
+        # self.template_link = deployment['templateLink']
         self.icon_link = deployment['iconLink']
         self.created_at = deployment['createdAt']
         self.created_by = deployment['createdBy']
