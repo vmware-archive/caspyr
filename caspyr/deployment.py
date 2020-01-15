@@ -13,14 +13,14 @@ class Deployment(object):
         self.id = deployment['id']
         self.name = deployment['name']
         self.description = deployment['description']
-        # self.template_link = deployment['templateLink']
+        self.blueprint_id = deployment['blueprintId']
         # self.icon_link = deployment['iconLink']
         self.created_at = deployment['createdAt']
         self.created_by = deployment['createdBy']
-        self.updated_at = deployment['updatedAt']
-        self.updated_by = deployment['updatedBy']
+        self.updated_at = deployment['lastUpdatedAt']
+        self.updated_by = deployment['lastUpdatedBy']
         self.inputs = deployment['inputs']
-        self.resource_links = deployment['resourceLinks']
+        # self.resource_links = deployment['resourceLinks']
 
     @staticmethod
     def list(session):
