@@ -42,7 +42,7 @@ class Deployment(object):
     @classmethod
     def describe(cls, session, id):
         uri = f'/deployment/api/deployments/{id}'
-        return cls(session._request(url=f'{session.baseurl}{uri}'))
+        return session._request(url=f'{session.baseurl}{uri}')
 
     @staticmethod
     def list_by_project_id(session, id):
