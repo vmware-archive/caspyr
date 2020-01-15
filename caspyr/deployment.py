@@ -14,7 +14,7 @@ class Deployment(object):
         self.name = deployment['name']
         self.description = deployment['description']
         # self.template_link = deployment['templateLink']
-        self.icon_link = deployment['iconLink']
+        # self.icon_link = deployment['iconLink']
         self.created_at = deployment['createdAt']
         self.created_by = deployment['createdBy']
         self.updated_at = deployment['updatedAt']
