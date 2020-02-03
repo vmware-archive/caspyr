@@ -37,7 +37,7 @@ class Session(object):
             uri = '/iaas/api/login'
             headers = {'Content-Type': 'application/json'}
             payload = {
-                'refreshToken': refresh_token
+                "refreshToken": refresh_token
             }
             logger.debug(f'POST to: {baseurl}{uri} \n'
                          f'with headers: {headers} \n'
