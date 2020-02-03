@@ -33,10 +33,11 @@ class Session(object):
 
     @classmethod
     def login(self, refresh_token):
-            baseurl = 'https://console.cloud.vmware.com/csp/gateway/am/api'
-            uri = f'/auth/api-tokens/authorize?refresh_token={refresh_token}'
+            uri = '/iaas/api/login'
             headers = {'Content-Type': 'application/json'}
-            payload = {}
+            payload = {
+                'refreshToken': refresh_token
+            }
             logger.debug(f'POST to: {baseurl}{uri} \n'
                          f'with headers: {headers} \n'
                          f'and body: {payload}.\n'
@@ -50,7 +51,7 @@ class Session(object):
                              f'Response: {r.json()} \n')
                 r.raise_for_status()
                 logger.info('Authenticated successfully.')
-                auth_token = r.json()['access_token']
+                auth_token = r.json()['token']
                 return self(auth_token)
             except requests.exceptions.HTTPError as e:
                 logger.error('Failed to authenticate.')
