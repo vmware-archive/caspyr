@@ -54,9 +54,14 @@ class Blueprint:
         :rtype: list
         """
 
-        uri = '/blueprint/api/blueprints/'
+        uri = '/blueprint/api/blueprints'
         j = session._request(f'{session.baseurl}{uri}')
-        return j['content']
+        content = j['content']
+        if int(j['totalPages']) > 0:
+            for page in range(1,int(j['totalPages'])):
+                j = session._request(f'{session.baseurl}{uri}?page={page}')
+                content = content + j['content']
+        return content
 
     @classmethod
     def describe(cls, session, blueprint_id):
