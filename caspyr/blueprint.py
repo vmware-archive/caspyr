@@ -56,12 +56,14 @@ class Blueprint:
 
         uri = '/blueprint/api/blueprints'
         j = session._request(f'{session.baseurl}{uri}')
-        content = j['content']
-        if int(j['totalPages']) > 0:
-            for page in range(1,int(j['totalPages'])):
-                j = session._request(f'{session.baseurl}{uri}?page={page}')
-                content = content + j['content']
-        return content
+        if 'content' in j:
+            content = j['content']
+            if int(j['totalPages']) > 0:
+                for page in range(1,int(j['totalPages'])):
+                    j = session._request(f'{session.baseurl}{uri}?page={page}')
+                    content = content + j['content']
+            return content
+        return []
 
     @classmethod
     def describe(cls, session, blueprint_id):
