@@ -34,9 +34,12 @@ class Session(object):
     @classmethod
     def login(self, refresh_token):
             baseurl = 'https://api.mgmt.cloud.vmware.com'
-            uri = f'/iaas/api/login?refreshToken={refresh_token}'
+            uri = '/iaas/api/login'
             headers = {'Content-Type': 'application/json'}
-            payload = {}
+            body = {
+                "refreshToken": f'{refresh_token}'
+            }
+            payload = json.dumps(body)
             logger.debug(f'POST to: {baseurl}{uri} \n'
                          f'with headers: {headers} \n'
                          f'and body: {payload}.\n'
