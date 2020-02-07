@@ -105,6 +105,7 @@ class Blueprint:
                bp_name,
                description,
                version,
+               request_scope_org,
                content
                ):
         """Creates a blueprint from a valid YAML input.
@@ -136,6 +137,7 @@ class Blueprint:
             'description': description,
             'tags': [],
             'content': content,
+            'requestScopeOrg': request_scope_org,
             'version': version
         }
         i = session._request(f'{session.baseurl}{uri}',
@@ -153,6 +155,7 @@ class Blueprint:
                bp_name,
                description,
                version,
+               request_scope_org,
                content
                ):
         """Updates a blueprint from a valid YAML input.
@@ -186,6 +189,7 @@ class Blueprint:
             'description': description,
             'tags': [],
             'content': content,
+            'requestScopeOrg': request_scope_org,
             'version': version
         }
         i = session._request(f'{session.baseurl}{uri}',
@@ -371,43 +375,3 @@ class Blueprint:
 
         return session._request(f'{session.baseurl}{uri}',
                                 request_method='GET')['content']
-
-    @classmethod
-    def release(cls, session, blueprint_id, version):
-        """Releases a version of the blueprint to the catalog
-
-        :param session: The session object.
-        :type session: object
-        :param blueprint_id: The id of the blueprint that you want the details
-        of.
-        :type blueprint_id: string
-        :param version: the new version of the blueprint.
-        :type version: string
-        :return: Returns the HTTP status code.
-        :rtype: int
-        """
-
-        uri = f'/blueprint/api/blueprints/{blueprint_id}/versions/{version}/actions/release'
-       
-        return session._request(f'{session.baseurl}{uri}',
-                                request_method='POST')
-
-    @classmethod
-    def unrelease(cls, session, blueprint_id, version):
-        """Unreleases a version of the blueprint from the catalog.
-
-        :param session: The session object.
-        :type session: object
-        :param blueprint_id: The id of the blueprint that you want the details
-        of.
-        :type blueprint_id: string
-        :param version: the new version of the blueprint.
-        :type version: string
-        :return: Returns the HTTP status code.
-        :rtype: int
-        """
-
-        uri = f'/blueprint/api/blueprints/{blueprint_id}/versions/{version}/actions/unrelease'
-       
-        return session._request(f'{session.baseurl}{uri}',
-                                request_method='POST')
