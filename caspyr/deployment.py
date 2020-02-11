@@ -54,3 +54,14 @@ class Deployment(object):
             ids['id'] = i['id']
             ids['name'] = i['name']
         return ids
+
+    @staticmethod
+    def check_status(session, id):
+        uri = f'/deployment/api/deployments/{id}/events'
+        stat = {}
+        j = session._request(url=f'{session.baseurl}{uri}')['content'][0]
+        for i in j:
+            stat['status'] = j['status']
+            if stat['status'] == "FAILED":
+                stat['statusMessage'] = j['details']
+        return stat

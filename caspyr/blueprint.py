@@ -27,7 +27,6 @@ class Blueprint:
     def __init__(self, blueprint):
         self.name = blueprint['name']
         self.description = blueprint['description']
-        self.tags = blueprint['tags']
         self.content = blueprint['content']
         self.valid = blueprint['valid']
         try:
@@ -37,7 +36,6 @@ class Blueprint:
         self.status = blueprint['status']
         self.project_id = blueprint['projectId']
         self.project_name = blueprint['projectName']
-        self.type = blueprint['type']
         self.id = blueprint['id']
         self.self_link = blueprint['selfLink']
         self.created_at = blueprint['createdAt']
@@ -56,10 +54,15 @@ class Blueprint:
         :rtype: list
         """
 
-        uri = '/blueprint/api/blueprints/'
+        uri = '/blueprint/api/blueprints'
         j = session._request(f'{session.baseurl}{uri}')
-        if 'objects' in j:
-            return j['objects']
+        if 'content' in j:
+            content = j['content']
+            if int(j['totalPages']) > 0:
+                for page in range(1,int(j['totalPages'])):
+                    j = session._request(f'{session.baseurl}{uri}?page={page}')
+                    content = content + j['content']
+            return content
         return []
 
     @classmethod
@@ -77,7 +80,7 @@ class Blueprint:
         """
 
         uri = f'/blueprint/api/blueprints/{blueprint_id}'
-        return cls(session._request(f'{session.baseurl}{uri}')[''])
+        return cls(session._request(f'{session.baseurl}{uri}'))
 
     @staticmethod
     def get_inputs(session, blueprint_id):
@@ -102,6 +105,7 @@ class Blueprint:
                bp_name,
                description,
                version,
+               request_scope_org,
                content
                ):
         """Creates a blueprint from a valid YAML input.
@@ -133,10 +137,63 @@ class Blueprint:
             'description': description,
             'tags': [],
             'content': content,
+            'requestScopeOrg': request_scope_org,
             'version': version
         }
         i = session._request(f'{session.baseurl}{uri}',
                              request_method='POST',
+                             payload=payload
+                             )
+        return cls.describe(session,
+                            blueprint_id=i['id']
+                            )
+    @classmethod
+    def update(cls,
+               session,
+               project_id,
+               blueprint_id,
+               bp_name,
+               description,
+               version,
+               request_scope_org,
+               content
+               ):
+        """Updates a blueprint from a valid YAML input.
+
+        :param session: The session object.
+        :type session: object
+        :param project_id: The unique ID of the project in which to place
+        this blueprint.
+        :type project_id: str
+        :param blueprint_id: The unique ID of the blueprint to update
+        :type project_id: str
+        :param bp_name: The name of the blueprint.
+        :type bp_name: str
+        :param description: A description of what the blueprint is/does.
+        :type description: str
+        :param version: The version of the blueprint you are passing.
+        :type version: str
+        :param content: Valid blueprint YAML, should be enclosed in double
+        quotes.
+        :type content: str
+        :return: blueprint
+        :rtype: object
+        """
+        # pylint: disable=too-many-arguments
+        # require these arguments to create a blueprint
+
+        uri = f'/blueprint/api/blueprints/{blueprint_id}'
+        payload = {
+            'projectId': project_id,
+            'name': bp_name,
+            'description': description,
+            'tags': [],
+            'content': content,
+            'requestScopeOrg': request_scope_org,
+            'version': version
+        }
+        i = session._request(f'{session.baseurl}{uri}',
+                             request_method='PUT',
                              payload=payload
                              )
         return cls.describe(session,
@@ -258,3 +315,63 @@ class Blueprint:
                                 request_method='POST',
                                 payload=payload
                                 )
+                                
+    @classmethod
+    def version(cls,
+                session,
+                blueprint_id,
+                version,
+                changelog=None,
+                description=None,
+                release=False):
+        """creates a new version of the specified blueprint
+        and creates a class object of it.
+
+        :param session: The session object.
+        :type session: object
+        :param blueprint_id: The id of the blueprint that you want the details
+        of.
+        :type blueprint_id: string
+        :param version: the new version of the blueprint.
+        :type version: string
+        :param changelog: Changelog for this version
+        :type changelog: string, optional
+        :param description: Description for this version
+        :type description: string, optional
+        :param release: Whether to release this version to the catalog
+        :type release: boolean, optional
+        :return: Returns the HTTP status code.
+        :rtype: int
+        """
+
+        uri = f'/blueprint/api/blueprints/{blueprint_id}/versions'
+        payload = {
+                   "changeLog": changelog,
+                   "description": description,
+                   "release": release,
+                   "version": version
+                   }
+        return session._request(f'{session.baseurl}{uri}',
+                                request_method='POST',
+                                payload=payload)
+
+    @classmethod
+    def versions(cls,
+                session,
+                blueprint_id):
+        """creates a new version of the specified blueprint
+        and creates a class object of it.
+
+        :param session: The session object.
+        :type session: object
+        :param blueprint_id: The id of the blueprint that you want the details
+        of.
+        :type blueprint_id: string
+        :return: Returns an array of version strings.
+        :rtype: int
+        """
+
+        uri = f'/blueprint/api/blueprints/{blueprint_id}/versions'
+
+        return session._request(f'{session.baseurl}{uri}',
+                                request_method='GET')['content']
