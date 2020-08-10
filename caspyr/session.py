@@ -32,8 +32,8 @@ class Session(object):
         self.baseurl = 'https://api.mgmt.cloud.vmware.com'
 
     @classmethod
-    def login(self, refresh_token):
-            baseurl = 'https://api.mgmt.cloud.vmware.com'
+    def login(self, refresh_token, baseurl = 'https://api.mgmt.cloud.vmware.com'):
+	    self.baseurl = baseurl
             uri = '/iaas/api/login'
             headers = {'Content-Type': 'application/json'}
             body = {
