@@ -1,3 +1,6 @@
+# Caspyr is no longer actively maintained
+VMware has ended active development of this project, this repository will no longer be updated.
+
 [![CircleCI](https://circleci.com/gh/vmware/caspyr.svg?style=svg&circle-token=3f64147ffcf9072fc8c41ab0a60cf33f969f3ebe)](https://circleci.com/gh/vmware/caspyr)
 
 # Cloud Automation Services SDK for Python (Caspyr)
