@@ -24,16 +24,15 @@ class Session(object):
 
     Requires refresh token from VMware Cloud Services portal to instantiate.
     """
-    def __init__(self, auth_token):
+    def __init__(self, auth_token, baseurl = 'https://api.mgmt.cloud.vmware.com'):
         self.token = auth_token
         self.headers = {'Content-Type': 'application/json',
                         'Authorization': f'Bearer {self.token}',
 			'csp-auth-token': f'{self.token}'}
-        self.baseurl = 'https://api.mgmt.cloud.vmware.com'
+        self.baseurl = baseurl
 
     @classmethod
-    def login(self, refresh_token):
-            baseurl = 'https://api.mgmt.cloud.vmware.com'
+    def login(self, refresh_token, baseurl = 'https://api.mgmt.cloud.vmware.com'):
             uri = '/iaas/api/login'
             headers = {'Content-Type': 'application/json'}
             body = {
@@ -54,7 +53,7 @@ class Session(object):
                 r.raise_for_status()
                 logger.info('Authenticated successfully.')
                 auth_token = r.json()['token']
-                return self(auth_token)
+                return self(auth_token, baseurl)
             except requests.exceptions.HTTPError as e:
                 logger.error('Failed to authenticate.')
                 logger.error(f'Error message {r.json()["message"]}',
